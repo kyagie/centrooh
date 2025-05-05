@@ -95,4 +95,20 @@ class User extends Authenticatable
     {
         return $this->hasMany(District::class, 'created_by');
     }
+    
+    /**
+     * Get the billboards created by the user.
+     */
+    public function createdBillboards()
+    {
+        return $this->hasMany(Billboard::class, 'created_by');
+    }
+    
+    /**
+     * Get the billboards reviewed by the user.
+     */
+    public function reviewedBillboards()
+    {
+        return $this->hasMany(Billboard::class, 'reviewed_by');
+    }
 }

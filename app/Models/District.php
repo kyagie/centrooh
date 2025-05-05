@@ -39,4 +39,20 @@ class District extends Model
     {
         return $this->belongsTo(User::class, 'created_by');
     }
+    
+    /**
+     * Get the billboards in this district.
+     */
+    public function billboards()
+    {
+        return $this->hasMany(Billboard::class);
+    }
+    
+    /**
+     * Get the agents assigned to this district.
+     */
+    public function agents()
+    {
+        return $this->hasMany(Agent::class);
+    }
 }

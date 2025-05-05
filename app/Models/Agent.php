@@ -90,4 +90,12 @@ class Agent extends Model
     {
         return $this->belongsTo(District::class);
     }
+    
+    /**
+     * Get the billboards assigned to this agent.
+     */
+    public function billboards()
+    {
+        return $this->hasMany(Billboard::class);
+    }
 }
