@@ -79,4 +79,20 @@ class User extends Authenticatable
     {
         return $this->hasMany(Agent::class, 'user_id');
     }
+    
+    /**
+     * Get the regions created by the user.
+     */
+    public function createdRegions()
+    {
+        return $this->hasMany(Region::class, 'created_by');
+    }
+    
+    /**
+     * Get the districts created by the user.
+     */
+    public function createdDistricts()
+    {
+        return $this->hasMany(District::class, 'created_by');
+    }
 }

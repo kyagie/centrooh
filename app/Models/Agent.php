@@ -35,7 +35,9 @@ class Agent extends Model
         'status',
         'user_id',
         'created_by',
-        'approved_by'
+        'approved_by',
+        'region_id',
+        'district_id'
     ];
 
     /**
@@ -71,5 +73,21 @@ class Agent extends Model
     public function approver()
     {
         return $this->belongsTo(User::class, 'approved_by');
+    }
+    
+    /**
+     * Get the region associated with the agent.
+     */
+    public function region()
+    {
+        return $this->belongsTo(Region::class);
+    }
+    
+    /**
+     * Get the district associated with the agent.
+     */
+    public function district()
+    {
+        return $this->belongsTo(District::class);
     }
 }
