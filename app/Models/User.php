@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
+use App\Models\Agent;
 
 class User extends Authenticatable
 {
@@ -45,5 +46,37 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * Get the agent associated with the user.
+     */
+    public function agent()
+    {
+        return $this->hasOne(Agent::class);
+    }
+
+    /**
+     * Get the agents created by the user.
+     */
+    public function createdAgents()
+    {
+        return $this->hasMany(Agent::class, 'created_by');
+    }
+
+    /**
+     * Get the agents approved by the user.
+     */
+    public function approvedAgents()
+    {
+        return $this->hasMany(Agent::class, 'approved_by');
+    }
+
+    /**
+     * Get the agents that the user is associated with.
+     */
+    public function agents()
+    {
+        return $this->hasMany(Agent::class, 'user_id');
     }
 }
