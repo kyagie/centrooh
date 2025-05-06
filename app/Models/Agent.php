@@ -114,4 +114,31 @@ class Agent extends Model
     {
         return $this->hasMany(BillboardImage::class)->where('uploader_type', 'agent');
     }
+    
+    /**
+     * Generate a unique username based on the agent's first and last name.
+     *
+     * @param string $firstName The agent's first name
+     * @param string $lastName The agent's last name
+     * @return string A unique username
+     */
+    public static function generateUniqueUsername(string $firstName, string $lastName): string
+    {
+        // Convert to lowercase and combine first and last name with a dot
+        $baseUsername = strtolower($firstName . '.' . $lastName);
+        
+        // Remove any non-alphanumeric characters except dots
+        $baseUsername = preg_replace('/[^a-z0-9.]/', '', $baseUsername);
+        
+        // Check if username exists, if so, add a counter
+        $username = $baseUsername;
+        $counter = 1;
+        
+        while (self::where('username', $username)->exists()) {
+            $username = $baseUsername . $counter;
+            $counter++;
+        }
+        
+        return $username;
+    }
 }
