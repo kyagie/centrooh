@@ -92,6 +92,14 @@ class Agent extends Model
     }
     
     /**
+     * Get the devices associated with the agent.
+     */
+    public function devices()
+    {
+        return $this->hasMany(Device::class);
+    }
+    
+    /**
      * Get the billboards assigned to this agent.
      */
     public function billboards()
