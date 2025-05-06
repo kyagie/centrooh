@@ -90,6 +90,22 @@ class Billboard extends Model
     }
     
     /**
+     * Get all images for this billboard.
+     */
+    public function images()
+    {
+        return $this->hasMany(BillboardImage::class);
+    }
+    
+    /**
+     * Get the primary image for this billboard.
+     */
+    public function primaryImage()
+    {
+        return $this->hasOne(BillboardImage::class)->where('is_primary', true);
+    }
+    
+    /**
      * Scope a query to only include active billboards.
      */
     public function scopeActive($query)

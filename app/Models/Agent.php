@@ -98,4 +98,12 @@ class Agent extends Model
     {
         return $this->hasMany(Billboard::class);
     }
+    
+    /**
+     * Get billboard images uploaded by this agent.
+     */
+    public function billboardImages()
+    {
+        return $this->hasMany(BillboardImage::class)->where('uploader_type', 'agent');
+    }
 }

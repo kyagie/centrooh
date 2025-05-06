@@ -111,4 +111,12 @@ class User extends Authenticatable
     {
         return $this->hasMany(Billboard::class, 'reviewed_by');
     }
+    
+    /**
+     * Get billboard images uploaded by the user.
+     */
+    public function billboardImages()
+    {
+        return $this->hasMany(BillboardImage::class)->where('uploader_type', 'user');
+    }
 }
