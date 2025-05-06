@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\OneTimePassword;
-use App\Models\Agent;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
