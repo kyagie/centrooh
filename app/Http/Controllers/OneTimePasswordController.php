@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\SendOneTimePassword;
 use App\Models\OneTimePassword;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -36,9 +37,8 @@ class OneTimePasswordController extends Controller
         // Create OTP record
         $otp = OneTimePassword::createForPhone($phoneNumber);
 
-        // In a real application, we would send SMS here
-        // For now, we'll log the OTP for testing purposes
-        Log::info("OTP for {$phoneNumber}: {$otp->otp_code}");
+        // Dispatch job to send OTP
+        SendOneTimePassword::dispatch($otp);
 
         return response()->json([
             'status' => 'success',
@@ -120,9 +120,8 @@ class OneTimePasswordController extends Controller
         // Create a new OTP (this will override any existing one)
         $otp = OneTimePassword::createForPhone($phoneNumber);
 
-        // In a real application, we would send SMS here
-        // For now, we'll log the OTP for testing purposes
-        Log::info("Resent OTP for {$phoneNumber}: {$otp->otp_code}");
+        // Dispatch job to send OTP
+        SendOneTimePassword::dispatch($otp);
 
         return response()->json([
             'status' => 'success',
