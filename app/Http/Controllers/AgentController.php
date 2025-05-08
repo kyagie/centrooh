@@ -2,11 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\{User, Agent, Device, OneTimePassword};
+use App\Models\{
+    User,
+    Agent,
+    Device,
+    OneTimePassword,
+    Billboard,
+    BillboardImage
+};
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
+use Illuminate\Support\Facades\Validator;
 
 class AgentController extends Controller
 {
@@ -119,5 +127,81 @@ class AgentController extends Controller
                 'error' => $e->getMessage()
             ], 500);
         }
+    }
+
+    /**
+     * Get billboards assigned to the authenticated agent.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getAssignedBillboards(Request $request)
+    {
+        $agent = $request->user()->agent;
+
+        $billboards = $agent->billboards()
+            ->with(['region', 'district', 'siteCode', 'images' => function ($query) {
+                $query->latest()->take(5);
+            }])
+            ->get();
+
+        return response()->json([
+            'status' => 'success',
+            'data' => [
+                'billboards' => $billboards
+            ]
+        ]);
+    }
+
+    /**
+     * Upload a billboard image.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function uploadBillboardImage(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'billboard_id' => 'required|exists:billboards,id',
+            'image' => 'required|image|max:5120', // 5MB max
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Validation failed',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        $agent = $request->user()->agent;
+        $billboard = Billboard::find($request->billboard_id);
+
+        // Check if billboard is assigned to this agent
+        if ($billboard->agent_id !== $agent->id) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'This billboard is not assigned to you'
+            ], 403);
+        }
+
+        // Store the image
+        $imagePath = $request->file('image')->store('billboard-images', 'public');
+
+        // Create billboard image record
+        $billboardImage = BillboardImage::create([
+            'billboard_id' => $billboard->id,
+            'image_path' => $imagePath,
+            'uploader_id' => $agent->id,
+            'uploader_type' => 'agent',
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Image uploaded successfully',
+            'data' => [
+                'image' => $billboardImage
+            ]
+        ]);
     }
 }
