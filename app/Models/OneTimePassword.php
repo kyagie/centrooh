@@ -40,7 +40,7 @@ class OneTimePassword extends Model
      * @param int $length
      * @return string
      */
-    public static function generateOtp(int $length = 6): string
+    public static function generateOtp(int $length = 4): string
     {
         return str_pad((string) random_int(0, pow(10, $length) - 1), $length, '0', STR_PAD_LEFT);
     }
