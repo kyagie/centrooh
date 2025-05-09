@@ -2,13 +2,13 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\{OneTimePasswordController, AgentController, AuthController};
+use App\Http\Controllers\{AgentController, AuthController};
 
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
-// Agent registration
+// Agent registration.
 Route::post('/agents/register', [AgentController::class, 'register']);
 
 // OTP routes with rate limiting
