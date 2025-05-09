@@ -21,8 +21,13 @@ class AuthController extends Controller
     public function requestOtp(Request $request)
     {
         $request->validate([
-            'phone_number' => 'required|string',
-        ]);
+            'phone_number' => 'required|numeric',
+        ],
+        [
+            'phone_number.required' => 'The phone number field is required.',
+            'phone_number.numeric' => 'The phone number must be a valid number.',
+        ]
+    );
 
         // Normalize the phone number
         $phoneNumber = preg_replace('/[^0-9]/', '', $request->phone_number);
@@ -72,7 +77,7 @@ class AuthController extends Controller
             return response()->json([
                 'message' => 'Phone number is not associated with any agent',
                 'status' => 'unregistered'
-            ], 404);
+            ], 200);
         }
         
         // Get the user associated with the agent
