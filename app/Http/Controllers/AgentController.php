@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class AgentController extends Controller
 {
@@ -27,19 +28,30 @@ class AgentController extends Controller
     public function register(Request $request)
     {
         // Validate request data
-        $request->validate([
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'phone_number' => 'required|string|regex:/^(\+?256|0)7[0-9]{8}$/|unique:users,phone_number',
-            'email' => 'nullable|email|unique:users,email',
-            'password' => 'required|string|min:8',
-            'device_info' => 'nullable|array',
-            'device_info.device_id' => 'nullable|string',
-            'device_info.brand' => 'nullable|string',
-            'device_info.name' => 'nullable|string',
-            'device_info.ipaddress' => 'nullable|ip',
-            'device_info.token' => 'nullable|string',
-        ]);
+        $request->validate(
+            [
+                'first_name' => 'required|string|max:255',
+                'last_name' => 'required|string|max:255',
+                'phone_number' => 'required|numeric|unique:agents,phone_number',
+                'email' => 'required|email|unique:users,email',
+                'device_info' => 'required|array',
+                'device_info.type' => 'nullable|string',
+                'device_info.brand' => 'nullable|string',
+                'device_info.name' => 'nullable|string',
+                'device_info.token' => 'nullable|string',
+            ],
+            [
+                'first_name.required' => 'The first name field is required.',
+                'last_name.required' => 'The last name field is required.',
+                'phone_number.required' => 'The phone number field is required.',
+                'phone_number.numeric' => 'The phone number must be a valid number.',
+                'phone_number.unique' => 'The phone number has already been taken.',
+                'email.required' => 'The email field is required.',
+                'email.email' => 'The email must be a valid email address.',
+                'email.unique' => 'The email has already been taken.',
+                'device_info.required' => 'Device information is required.',
+            ]
+        );
 
         // Check if phone number has been verified with OTP
         $phoneNumber = $request->input('phone_number');
@@ -68,10 +80,9 @@ class AgentController extends Controller
         try {
             // Create user
             $user = User::create([
-                'name' => $request->input('first_name') . ' ' . $request->input('last_name'),
+                'name' => ucfirst($request->input('first_name')) . ' ' . ucfirst($request->input('last_name')),
                 'email' => $request->input('email'),
-                'phone_number' => $phoneNumber,
-                'password' => Hash::make($request->input('password')),
+                'password' => Hash::make($normalizedPhone),
             ]);
 
             // Assign agent role to user
@@ -81,30 +92,35 @@ class AgentController extends Controller
             // Create agent
             $agent = Agent::create([
                 'username' => $username,
+                'profile_picture' => '',
                 'phone_number' => $phoneNumber,
+                'alt_phone_number' => '',
                 'status' => 'pending',
                 'user_id' => $user->id,
+                'created_by' => $user->id,
+                'approved_by' => null,
+                'region_id' => null,
+                'district_id' => null,
             ]);
 
-            // Register device if device info is provided
-            $deviceToken = null;
-
-            if ($request->has('device_info') && $request->filled('device_info.device_id')) {
+            if ($request->has('device_info')) {
                 $deviceInfo = $request->input('device_info');
 
-                Device::create([
-                    'device_id' => $deviceInfo['device_id'],
+                $device =  Device::create([
+                    'device_id' => Str::uuid(),
+                    'device_type' => $deviceInfo['type'] ?? null,
                     'brand' => $deviceInfo['brand'] ?? null,
-                    'name' => $deviceInfo['name'] ?? $deviceInfo['device_id'],
-                    'ipaddress' => $deviceInfo['ipaddress'] ?? $request->ip(),
+                    'name' => $deviceInfo['name'] ?? null,
                     'token' => $deviceInfo['token'] ?? null,
                     'agent_id' => $agent->id,
-                    'active' => true,
                 ]);
             }
 
             // Create auth token for API
-            $token = $user->createToken('agent-auth-token')->plainTextToken;
+            $token = $user->createToken(
+                "agent-auth-token-{$device->device_id}",
+                ['*'],
+            )->plainTextToken;
 
             DB::commit();
 
