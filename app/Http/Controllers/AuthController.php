@@ -107,7 +107,9 @@ class AuthController extends Controller
         return response()->json([
             'message' => 'OTP verified successfully',
             'status' => 'authenticated',
-            'agent' => $agent->load(['region', 'district']),
+            'agent' => $agent->load([
+                'user',
+            ]),
             'token' => $token,
         ]);
     }
@@ -130,8 +132,9 @@ class AuthController extends Controller
         }
 
         return response()->json([
-            'agent' => $agent->load(['region', 'district']),
-            'user' => $user
+            'agent' => $agent->load([
+                'user',
+            ]),
         ]);
     }
 
