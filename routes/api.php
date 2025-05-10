@@ -9,7 +9,7 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 // Agent registration.
-Route::post('/agents/register', [AgentController::class, 'register']);
+Route::post('/agent/register', [AgentController::class, 'register']);
 
 // OTP routes with rate limiting
 Route::middleware('throttle:otp')->group(function () {
@@ -20,9 +20,9 @@ Route::middleware('throttle:otp')->group(function () {
 
 // Protected routes (require authentication)
 Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/auth/me', [AuthController::class, 'me']);
-    Route::post('/auth/logout', [AuthController::class, 'logout']);
-    Route::post('/auth/logout-all', [AuthController::class, 'logoutAll']);
+    Route::get('/agent/me', [AuthController::class, 'me']);
+    Route::post('/agent/logout', [AuthController::class, 'logout']);
+    Route::post('/agent/logout-all', [AuthController::class, 'logoutAll']);
 
     // Agent-specific routes (requires user to have an agent profile)
     Route::middleware('ensure.agent')->group(function () {
