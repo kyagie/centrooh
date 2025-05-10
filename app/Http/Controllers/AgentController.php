@@ -120,14 +120,15 @@ class AgentController extends Controller
             DB::commit();
 
             return response()->json([
-                'status' => 'success',
                 'message' => 'Agent registered successfully',
+                'status' => 'registered',
                 'data' => [
-                    'user' => $user,
-                    'agent' => $agent,
+                    'agent' => $agent->load([
+                        'user',
+                    ]),
                     'token' => $token,
                 ]
-            ], 201);
+            ]);
         } catch (\Exception $e) {
             DB::rollBack();
 
