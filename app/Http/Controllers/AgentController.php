@@ -122,12 +122,10 @@ class AgentController extends Controller
             return response()->json([
                 'message' => 'Agent registered successfully',
                 'status' => 'registered',
-                'data' => [
-                    'agent' => $agent->load([
-                        'user',
-                    ]),
-                    'token' => $token,
-                ]
+                'agent' => $agent->load([
+                    'user',
+                ]),
+                'token' => $token,
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
