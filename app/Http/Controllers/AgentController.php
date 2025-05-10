@@ -92,15 +92,10 @@ class AgentController extends Controller
             // Create agent
             $agent = Agent::create([
                 'username' => $username,
-                'profile_picture' => '',
                 'phone_number' => $phoneNumber,
-                'alt_phone_number' => '',
-                'status' => 'pending',
+                'status' => 'inactive',
                 'user_id' => $user->id,
                 'created_by' => $user->id,
-                'approved_by' => null,
-                'region_id' => null,
-                'district_id' => null,
             ]);
 
             if ($request->has('device_info')) {
@@ -130,7 +125,6 @@ class AgentController extends Controller
                 'data' => [
                     'user' => $user,
                     'agent' => $agent,
-                    'username' => $username,
                     'token' => $token,
                 ]
             ], 201);
