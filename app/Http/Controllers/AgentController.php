@@ -156,9 +156,7 @@ class AgentController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'data' => [
-                'billboards' => $billboards
-            ]
+            'billboards' => $billboards
         ]);
     }
 
@@ -208,9 +206,7 @@ class AgentController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Image uploaded successfully',
-            'data' => [
-                'image' => $billboardImage
-            ]
+            'image' => $billboardImage
         ]);
     }
 }

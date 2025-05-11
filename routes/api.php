@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\{AgentController, AuthController};
+use App\Http\Middleware\EnsureUserIsAgent;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -25,7 +26,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/agent/logout-all', [AuthController::class, 'logoutAll']);
 
     // Agent-specific routes (requires user to have an agent profile)
-    Route::middleware('ensure.agent')->group(function () {
+    Route::middleware([EnsureUserIsAgent::class])->group(function () {
         Route::get('/agent/billboards', [AgentController::class, 'getAssignedBillboards']);
         Route::post('/agent/billboards/upload-image', [AgentController::class, 'uploadBillboardImage']);
     });
