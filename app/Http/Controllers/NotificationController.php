@@ -26,6 +26,29 @@ class NotificationController extends Controller
     }
 
     /**
+     * Display details of a notification.
+     */
+
+    public function show(string $id): JsonResponse
+    {
+        $agent = $this->getAuthenticatedAgent();
+
+        $notification = $agent->notifications()->where('id', $id)->first();
+
+        if (!$notification) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Notification not found'
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'notification' => $notification
+        ]);
+    }
+
+    /**
      * Display a listing of the agent's unread notifications.
      */
     public function unread(Request $request): JsonResponse
