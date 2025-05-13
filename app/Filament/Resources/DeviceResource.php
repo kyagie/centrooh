@@ -23,23 +23,25 @@ class DeviceResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('device_id')
-                    ->required()
-                    ->maxLength(255),
                 Forms\Components\TextInput::make('device_type')
-                    ->maxLength(255),
+                    ->maxLength(255)
+                    ->disabled(),
                 Forms\Components\TextInput::make('brand')
-                    ->maxLength(255),
+                    ->maxLength(255)
+                    ->disabled(),
                 Forms\Components\TextInput::make('name')
                     ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('token')
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('agent_id')
+                    ->maxLength(255)
+                    ->disabled(),
+                Forms\Components\Select::make('agent_id')
+                    ->label('Agent')
+                    ->relationship('agent', 'username')
+                    ->searchable()
                     ->required()
-                    ->numeric(),
+                    ->disabled(),
                 Forms\Components\Toggle::make('active')
-                    ->required(),
+                    ->required()
+                    ->disabled(),
             ]);
     }
 
@@ -47,33 +49,17 @@ class DeviceResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('device_id')
-                    ->searchable(),
                 Tables\Columns\TextColumn::make('device_type')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('brand')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('token')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('agent_id')
-                    ->numeric()
+                Tables\Columns\TextColumn::make('agent.username')
+                    ->label('Agent')
                     ->sortable(),
                 Tables\Columns\IconColumn::make('active')
                     ->boolean(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('deleted_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 //

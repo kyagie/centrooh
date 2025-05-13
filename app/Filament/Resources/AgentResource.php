@@ -17,12 +17,16 @@ class AgentResource extends Resource
 {
     protected static ?string $model = Agent::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-user-group';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
+                Forms\Components\Select::make('user_id')
+                    ->label('Full Name')
+                    ->relationship('user', 'name')
+                    ->disabled(),
                 Forms\Components\TextInput::make('username')
                     ->required()
                     ->maxLength(255)
@@ -39,11 +43,6 @@ class AgentResource extends Resource
                 Forms\Components\Select::make('district_id')
                     ->label('District')
                     ->relationship('district', 'name')
-                    ->searchable()
-                    ->required(),
-                Forms\Components\Select::make('user_id')
-                    ->label('User')
-                    ->relationship('user', 'name')
                     ->searchable()
                     ->required(),
                 Forms\Components\Select::make('status')
