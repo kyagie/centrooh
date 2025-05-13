@@ -25,29 +25,39 @@ class AgentResource extends Resource
             ->schema([
                 Forms\Components\TextInput::make('username')
                     ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('profile_picture')
-                    ->maxLength(255),
+                    ->maxLength(255)
+                    ->disabled(),
                 Forms\Components\TextInput::make('phone_number')
                     ->tel()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('alt_phone_number')
-                    ->tel()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('status')
-                    ->required()
                     ->maxLength(255)
-                    ->default('inactive'),
-                Forms\Components\TextInput::make('user_id')
-                    ->numeric(),
-                Forms\Components\TextInput::make('created_by')
-                    ->numeric(),
-                Forms\Components\TextInput::make('approved_by')
-                    ->numeric(),
-                Forms\Components\TextInput::make('region_id')
-                    ->numeric(),
-                Forms\Components\TextInput::make('district_id')
-                    ->numeric(),
+                    ->disabled(),
+                Forms\Components\Select::make('region_id')
+                    ->label('Region')
+                    ->relationship('region', 'name')
+                    ->searchable()
+                    ->required(),
+                Forms\Components\Select::make('district_id')
+                    ->label('District')
+                    ->relationship('district', 'name')
+                    ->searchable()
+                    ->required(),
+                Forms\Components\Select::make('user_id')
+                    ->label('User')
+                    ->relationship('user', 'name')
+                    ->searchable()
+                    ->required(),
+                Forms\Components\Select::make('status')
+                    ->options([
+                        'active' => 'Active',
+                        'inactive' => 'Inactive',
+                    ])
+                    ->required(),
+                Forms\Components\FileUpload::make('profile_picture')
+                    ->label('Profile Picture')
+                    ->image()
+                    ->imageEditor()
+                    ->directory('profile-pictures')
+                    ->maxSize(2048),
             ]);
     }
 
@@ -55,43 +65,15 @@ class AgentResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('username')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('profile_picture')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('phone_number')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('alt_phone_number')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('status')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('user_id')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('created_by')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('approved_by')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('deleted_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('region_id')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('district_id')
-                    ->numeric()
-                    ->sortable(),
+                Tables\Columns\TextColumn::make('username')->searchable(),
+                Tables\Columns\TextColumn::make('phone_number')->searchable(),
+                Tables\Columns\TextColumn::make('region.name')->label('Region')->sortable(),
+                Tables\Columns\TextColumn::make('user.name')->label('Full Name')->sortable(),
+                Tables\Columns\TextColumn::make('status')->sortable(),
+                Tables\Columns\ImageColumn::make('profile_picture')
+                    ->label('Profile Picture')
+                    ->disk('public')
+                    ->circular(),
             ])
             ->filters([
                 //
