@@ -26,18 +26,23 @@ class OneTimePasswordResource extends Resource
                 Forms\Components\TextInput::make('phone_number')
                     ->tel()
                     ->required()
-                    ->maxLength(255),
+                    ->maxLength(255)
+                    ->disabled(),
                 Forms\Components\TextInput::make('otp_code')
                     ->required()
-                    ->maxLength(255),
+                    ->maxLength(255)
+                    ->disabled(),
                 Forms\Components\Toggle::make('verified')
-                    ->required(),
+                    ->required()
+                    ->disabled(),
                 Forms\Components\DateTimePicker::make('expires_at')
-                    ->required(),
+                    ->required()
+                    ->disabled(),
                 Forms\Components\TextInput::make('attempts')
                     ->required()
                     ->numeric()
-                    ->default(0),
+                    ->default(0)
+                    ->disabled(),
             ]);
     }
 
@@ -54,17 +59,9 @@ class OneTimePasswordResource extends Resource
                 Tables\Columns\TextColumn::make('expires_at')
                     ->dateTime()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('attempts')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('expired')
+                    ->label('Expired')
+                    ->formatStateUsing(fn ($record) => $record->expires_at < now() ? 'Yes' : 'No'),
             ])
             ->filters([
                 //
