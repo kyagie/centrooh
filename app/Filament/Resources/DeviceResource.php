@@ -1,0 +1,92 @@
+<?php
+
+namespace App\Filament\Resources;
+
+use App\Filament\Resources\DeviceResource\Pages;
+use App\Filament\Resources\DeviceResource\RelationManagers;
+use App\Models\Device;
+use Filament\Forms;
+use Filament\Forms\Form;
+use Filament\Resources\Resource;
+use Filament\Tables;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
+
+class DeviceResource extends Resource
+{
+    protected static ?string $model = Device::class;
+
+    protected static ?string $navigationIcon = 'heroicon-o-phone';
+
+    public static function form(Form $form): Form
+    {
+        return $form
+            ->schema([
+                Forms\Components\TextInput::make('device_type')
+                    ->maxLength(255)
+                    ->disabled(),
+                Forms\Components\TextInput::make('brand')
+                    ->maxLength(255)
+                    ->disabled(),
+                Forms\Components\TextInput::make('name')
+                    ->required()
+                    ->maxLength(255)
+                    ->disabled(),
+                Forms\Components\Select::make('agent_id')
+                    ->label('Agent')
+                    ->relationship('agent', 'username')
+                    ->searchable()
+                    ->required()
+                    ->disabled(),
+                Forms\Components\Toggle::make('active')
+                    ->required()
+                    ->disabled(),
+            ]);
+    }
+
+    public static function table(Table $table): Table
+    {
+        return $table
+            ->columns([
+                Tables\Columns\TextColumn::make('device_type')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('brand')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('name')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('agent.username')
+                    ->label('Agent')
+                    ->sortable(),
+                Tables\Columns\IconColumn::make('active')
+                    ->boolean(),
+            ])
+            ->filters([
+                //
+            ])
+            ->actions([
+                Tables\Actions\EditAction::make(),
+            ])
+            ->bulkActions([
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\DeleteBulkAction::make(),
+                ]),
+            ]);
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            //
+        ];
+    }
+
+    public static function getPages(): array
+    {
+        return [
+            'index' => Pages\ListDevices::route('/'),
+            'create' => Pages\CreateDevice::route('/create'),
+            'edit' => Pages\EditDevice::route('/{record}/edit'),
+        ];
+    }
+}
