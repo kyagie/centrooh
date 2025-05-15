@@ -2,7 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\{AgentController, AuthController, NotificationController};
+use App\Http\Controllers\{AgentController, AuthController, BillboardController, NotificationController};
 use App\Http\Middleware\EnsureUserIsAgent;
 
 Route::get('/user', function (Request $request) {
@@ -29,6 +29,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware([EnsureUserIsAgent::class])->group(function () {
         Route::get('/agent/billboards', [AgentController::class, 'getAssignedBillboards']);
         Route::post('/agent/billboards/upload-image', [AgentController::class, 'uploadBillboardImage']);
+        Route::get('/agent/billboards/coordinates', [BillboardController::class, 'getAgentBillboardCoordinates']);
+        Route::get('/agent/billboards/{id}', [BillboardController::class, 'getBillboardDetails']);
         
         // Notification routes
         Route::get('/notifications', [NotificationController::class, 'all']);

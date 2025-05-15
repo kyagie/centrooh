@@ -49,6 +49,7 @@ class AgentResource extends Resource
                     ->options([
                         'active' => 'Active',
                         'inactive' => 'Inactive',
+                        'suspended' => 'Suspended',
                     ])
                     ->required(),
                 Forms\Components\FileUpload::make('profile_picture')
