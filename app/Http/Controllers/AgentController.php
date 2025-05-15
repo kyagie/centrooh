@@ -15,7 +15,12 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Http\File;
+use Intervention\Image\Laravel\Facades\Image;
+use Intervention\Image\Typography\FontFactory;
+use Intervention\Image\Geometry\Factories\RectangleFactory;
 
 class AgentController extends Controller
 {
@@ -168,48 +173,118 @@ class AgentController extends Controller
      */
     public function uploadBillboardImage(Request $request)
     {
-        $validator = Validator::make($request->all(), [
+        $validated = Validator::make($request->all(), [
             'billboard_id' => 'required|exists:billboards,id',
-            'image' => 'required|image|max:5120', 
+            'image' => 'required|image',
             'meta' => 'nullable|array',
         ]);
 
-        if ($validator->fails()) {
+        if ($validated->fails()) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Validation failed',
-                'errors' => $validator->errors()
+                'errors' => $validated->errors()
             ], 422);
         }
 
-        $agent = $request->user()->agent;
         $billboard = Billboard::find($request->billboard_id);
+        $agentId = $request->user()->agent->id;
 
-        // Check if billboard is assigned to this agent
-        if ($billboard->agent_id !== $agent->id) {
+        if ($billboard->agent_id !== $agentId) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'This billboard is not assigned to you'
             ], 403);
         }
 
-        // Store the image
-        $imagePath = $request->file('image')->store('billboard-images', 'public');
+        $image = $request->file('image');
+        $imageName = $this->generateImageName($billboard->name, $image->extension());
+        $formattedImageName = $this->addTextToImage($image, $billboard->toArray(), $imageName);
+        $imagePath = public_path("images/{$formattedImageName}");
 
-        // Create billboard image record
-        $billboardImage = BillboardImage::create([
-            'billboard_id' => $billboard->id,
-            'image_path' => $imagePath,
-            'uploader_id' => $agent->id,
-            'uploader_type' => 'agent',
-            'meta' => $request->meta,
-            'status' => 'inactive',  
-        ]);
+        try {
+            $path = Storage::putFileAs('billboards', new File($imagePath), $imageName, 'public');
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Image upload failed.',
+                'error' => $e->getMessage(),
+            ], 422);
+        }
+
+        if ($path) {
+            $billboard->images()->create([
+                'image_path' => $path,
+                'image_type' => 'billboard',
+                'status' => 'pending',
+                'uploader_type' => 'agent',
+                'is_primary' => false,
+                'meta' => $request->input('meta'),
+                'agent_id' => $agentId,
+            ]);
+
+            $billboard->update(['status' => 'in_review']);
+        }
 
         return response()->json([
             'status' => 'success',
             'message' => 'Image uploaded successfully',
-            'image' => $billboardImage
         ]);
+    }
+
+    /**
+     * Adds billboard metadata text to the image.
+     *
+     * @param  \Illuminate\Http\UploadedFile  $image
+     * @param  array  $billboardInfo
+     * @param  string  $imageName
+     * @return string
+     */
+    protected function addTextToImage($image, array $billboardInfo, string $imageName)
+    {
+        $img = Image::read($image);
+        $imgWidth = $img->width();
+        $imgHeight = $img->height();
+
+        $x = 0;
+        $y = $imgHeight - 160;
+        $currentDate = date('Y-m-d(D) H:i');
+
+        $text = <<<EOT
+Latitude: {$billboardInfo['latitude']}
+Longitude: {$billboardInfo['longitude']}
+{$currentDate}
+EOT;
+
+        $img->drawRectangle(
+            $x,
+            $y,
+            fn(RectangleFactory $rectangle) =>
+            $rectangle->size($imgWidth, 160)->background('#0000')
+        );
+
+        $img->text($text, $imgWidth / 2, $y + 60, function (FontFactory $font) {
+            $font->filename(public_path('assets/fonts/Exo2-Bold.otf'));
+            $font->size(38);
+            $font->color('#FFDB58');
+            $font->align('center');
+            $font->valign('center');
+        });
+
+        $img->save(public_path("images/{$imageName}"));
+
+        return $imageName;
+    }
+
+    /**
+     * Generate image file name with timestamp.
+     *
+     * @param  string  $name
+     * @param  string  $extension
+     * @return string
+     */
+    protected function generateImageName(string $name, string $extension): string
+    {
+        $timestamp = now()->format('Ymd_His');
+        return Str::snake($name) . "_{$timestamp}.{$extension}";
     }
 }
