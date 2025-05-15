@@ -166,6 +166,36 @@ class AgentController extends Controller
     }
 
     /**
+     * Get billboard details for the authenticated agent.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $billboardId
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getBillboardDetails(Request $request, $billboardId)
+    {
+        $agent = $request->user()->agent;
+
+        $billboard = $agent->billboards()
+            ->with(['district', 'siteCode', 'images' => function ($query) {
+                $query->active();
+            }])
+            ->find($billboardId);
+
+        if (!$billboard) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Billboard not found or not assigned to the agent.',
+            ], 404);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'billboard' => $billboard
+        ]);
+    }
+
+    /**
      * Upload a billboard image.
      *
      * @param  \Illuminate\Http\Request  $request
