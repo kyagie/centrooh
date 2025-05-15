@@ -149,10 +149,10 @@ class AgentController extends Controller
         $agent = $request->user()->agent;
 
         $billboards = $agent->billboards()
-            ->with(['region', 'district', 'siteCode', 'images' => function ($query) {
+            ->with(['district', 'siteCode', 'images' => function ($query) {
                 $query->latest()->take(5);
             }])
-            ->get();
+            ->paginate(7);
 
         return response()->json([
             'status' => 'success',
