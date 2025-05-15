@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Storage;
 
 class Agent extends Model
 {
@@ -23,7 +24,7 @@ class Agent extends Model
         'updated_at',
         'deleted_at'
     ];
-    
+
     /**
      * The attributes that are mass assignable.
      *
@@ -52,6 +53,14 @@ class Agent extends Model
         'deleted_at'
     ];
 
+    protected $appends = ['profile_picture_url'];
+
+
+    public function getProfilePictureUrlAttribute()
+    {
+        return $this->profile_picture ? Storage::url($this->profile_picture) : null;
+    }
+
     /**
      * Get the user associated with the agent.
      */
@@ -59,7 +68,7 @@ class Agent extends Model
     {
         return $this->belongsTo(User::class);
     }
-    
+
     /**
      * Get the user who created the agent.
      */
@@ -67,7 +76,7 @@ class Agent extends Model
     {
         return $this->belongsTo(User::class, 'created_by');
     }
-    
+
     /**
      * Get the user who approved the agent.
      */
@@ -75,7 +84,7 @@ class Agent extends Model
     {
         return $this->belongsTo(User::class, 'approved_by');
     }
-    
+
     /**
      * Get the region associated with the agent.
      */
@@ -83,7 +92,7 @@ class Agent extends Model
     {
         return $this->belongsTo(Region::class);
     }
-    
+
     /**
      * Get the district associated with the agent.
      */
@@ -91,7 +100,7 @@ class Agent extends Model
     {
         return $this->belongsTo(District::class);
     }
-    
+
     /**
      * Get the devices associated with the agent.
      */
@@ -99,7 +108,7 @@ class Agent extends Model
     {
         return $this->hasMany(Device::class);
     }
-    
+
     /**
      * Get the billboards assigned to this agent.
      */
@@ -107,7 +116,7 @@ class Agent extends Model
     {
         return $this->hasMany(Billboard::class);
     }
-    
+
     /**
      * Get billboard images uploaded by this agent.
      */
@@ -115,7 +124,7 @@ class Agent extends Model
     {
         return $this->hasMany(BillboardImage::class)->where('uploader_type', 'agent');
     }
-    
+
     /**
      * Generate a unique username based on the agent's first and last name.
      *
@@ -127,19 +136,19 @@ class Agent extends Model
     {
         // Convert to lowercase and combine first and last name with a dot
         $baseUsername = strtolower($firstName . '.' . $lastName);
-        
+
         // Remove any non-alphanumeric characters except dots
         $baseUsername = preg_replace('/[^a-z0-9.]/', '', $baseUsername);
-        
+
         // Check if username exists, if so, add a counter
         $username = $baseUsername;
         $counter = 1;
-        
+
         while (self::where('username', $username)->exists()) {
             $username = $baseUsername . $counter;
             $counter++;
         }
-        
+
         return $username;
     }
 }
