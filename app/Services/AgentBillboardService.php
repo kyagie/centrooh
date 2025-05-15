@@ -45,32 +45,4 @@ class AgentBillboardService
         Cache::forget($cacheKey);
         $this->getBillboardCoordinates($agentId);
     }
-
-    /**
-     * Get details of a single billboard for an agent.
-     *
-     * @param int $agentId
-     * @param int $billboardId
-     * @return array|null
-     */
-    public function getBillboardDetails(int $agentId, int $billboardId): ?array
-    {
-        $agent = Agent::with(['billboards' => function ($query) use ($billboardId) {
-            $query->where('id', $billboardId);
-        }])->find($agentId);
-        if (!$agent || $agent->billboards->isEmpty()) {
-            return null;
-        }
-        $billboard = $agent->billboards->first();
-        return [
-            'id' => $billboard->id,
-            'name' => $billboard->name,
-            'address' => $billboard->address,
-            'status' => $billboard->status,
-            'location' => $billboard->location,
-            'latitude' => $billboard->latitude,
-            'longitude' => $billboard->longitude,
-            'updated_at' => $billboard->updated_at,
-        ];
-    }
 }
