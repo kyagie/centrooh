@@ -9,8 +9,10 @@ use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 use Laravel\Sanctum\HasApiTokens;
 use App\Models\Agent;
+use Filament\Panel;
+use Filament\Models\Contracts\FilamentUser;
 
-class User extends Authenticatable
+class User extends Authenticatable implements FilamentUser
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable, HasRoles, HasApiTokens;
@@ -119,5 +121,10 @@ class User extends Authenticatable
     public function billboardImages()
     {
         return $this->hasMany(BillboardImage::class)->where('uploader_type', 'user');
+    }
+
+    public function canAccessPanel(Panel $panel): bool
+    {
+	    return true;
     }
 }
