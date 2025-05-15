@@ -53,11 +53,16 @@ class AgentResource extends Resource
                     ])
                     ->required(),
                 Forms\Components\FileUpload::make('profile_picture')
-                    ->label('Profile Picture')
+                    ->disk('do')
+                    ->directory('profile_pictures')
                     ->image()
                     ->imageEditor()
-                    ->directory('profile-pictures')
-                    ->maxSize(2048),
+                    ->imageEditorAspectRatios([
+                        null,
+                        '16:9',
+                        '4:3',
+                        '1:1',
+                    ]),
             ]);
     }
 

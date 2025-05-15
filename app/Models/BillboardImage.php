@@ -24,6 +24,7 @@ class BillboardImage extends Model
         'uploader_type',
         'user_id',
         'agent_id',
+        'meta',
     ];
     
     /**
@@ -33,6 +34,7 @@ class BillboardImage extends Model
      */
     protected $casts = [
         'is_primary' => 'boolean',
+        'meta' => 'array',
     ];
     
     /**

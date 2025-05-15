@@ -170,7 +170,8 @@ class AgentController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'billboard_id' => 'required|exists:billboards,id',
-            'image' => 'required|image|max:5120', // 5MB max
+            'image' => 'required|image|max:5120', 
+            'meta' => 'nullable|array',
         ]);
 
         if ($validator->fails()) {
@@ -201,6 +202,8 @@ class AgentController extends Controller
             'image_path' => $imagePath,
             'uploader_id' => $agent->id,
             'uploader_type' => 'agent',
+            'meta' => $request->meta,
+            'status' => 'inactive',  
         ]);
 
         return response()->json([
