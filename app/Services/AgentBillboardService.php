@@ -70,6 +70,7 @@ class AgentBillboardService
             'location' => $billboard->location,
             'latitude' => $billboard->latitude,
             'longitude' => $billboard->longitude,
+            'updated_at' => $billboard->updated_at,
         ];
     }
 }
