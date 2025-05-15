@@ -5,11 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Storage;
 
 class BillboardImage extends Model
 {
     use HasFactory, SoftDeletes;
-    
+
     /**
      * The attributes that are mass assignable.
      *
@@ -26,7 +27,7 @@ class BillboardImage extends Model
         'agent_id',
         'meta',
     ];
-    
+
     /**
      * The attributes that should be cast.
      *
@@ -36,7 +37,24 @@ class BillboardImage extends Model
         'is_primary' => 'boolean',
         'meta' => 'array',
     ];
-    
+
+    protected $appends = [
+        'image_url',
+    ];
+
+
+    /**
+     * Get the URL of the image.
+     *
+     * @return string
+     */
+    public function getImageUrlAttribute()
+    {
+        return $this->image_path
+            ? Storage::url($this->image_path)
+            : null;
+    }
+
     /**
      * Get the billboard that owns the image.
      */
@@ -44,7 +62,7 @@ class BillboardImage extends Model
     {
         return $this->belongsTo(Billboard::class);
     }
-    
+
     /**
      * Get the user who uploaded the image (if uploaded by a user).
      */
@@ -52,7 +70,7 @@ class BillboardImage extends Model
     {
         return $this->belongsTo(User::class);
     }
-    
+
     /**
      * Get the agent who uploaded the image (if uploaded by an agent).
      */
@@ -60,7 +78,7 @@ class BillboardImage extends Model
     {
         return $this->belongsTo(Agent::class);
     }
-    
+
     /**
      * Determine if the image was uploaded by a user.
      */
@@ -68,7 +86,7 @@ class BillboardImage extends Model
     {
         return $this->uploader_type === 'user';
     }
-    
+
     /**
      * Determine if the image was uploaded by an agent.
      */
@@ -76,7 +94,7 @@ class BillboardImage extends Model
     {
         return $this->uploader_type === 'agent';
     }
-    
+
     /**
      * Get the uploader of the image (either user or agent).
      */
@@ -86,7 +104,7 @@ class BillboardImage extends Model
             ? $this->user
             : $this->agent;
     }
-    
+
     /**
      * Scope a query to only include active images.
      */
@@ -94,7 +112,7 @@ class BillboardImage extends Model
     {
         return $query->where('status', 'active');
     }
-    
+
     /**
      * Scope a query to only include primary images.
      */

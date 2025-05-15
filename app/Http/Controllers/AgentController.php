@@ -155,7 +155,7 @@ class AgentController extends Controller
 
         $billboards = $agent->billboards()
             ->with(['district', 'siteCode', 'images' => function ($query) {
-                $query->latest()->take(5);
+                $query->active();
             }])
             ->paginate(7);
 
