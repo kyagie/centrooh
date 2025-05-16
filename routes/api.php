@@ -2,7 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\{AgentController, AuthController, BillboardController, NotificationController};
+use App\Http\Controllers\{AgentController, AuthController, BillboardController};
 use App\Http\Middleware\EnsureUserIsAgent;
 
 Route::get('/user', function (Request $request) {
@@ -33,10 +33,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/agent/billboards/{id}', [AgentController::class, 'getBillboardDetails']);
         
         // Notification routes
-        Route::get('/notifications', [NotificationController::class, 'all']);
-        Route::get('/notifications/{id}', [NotificationController::class, 'show']);
-        Route::get('/notifications/count', [NotificationController::class, 'getUnreadCount']);
-        Route::post('/notifications/mark-as-read/{id}', [NotificationController::class, 'markAsRead']);
-        Route::post('/notifications/mark-all-as-read', [NotificationController::class, 'markAllAsRead']);
+        Route::get('/agent/notifications', [AgentController::class, 'getNotifications']);
+        Route::get('/agent/notifications/unread', [AgentController::class, 'unreadNotificationsCount']);
+        Route::post('/agent/notifications/mark-all-read', [AgentController::class, 'markAllNotificationsAsRead']);
+        Route::get('/agent/notifications/{id}', [AgentController::class, 'notificationDetails']);
     });
 });

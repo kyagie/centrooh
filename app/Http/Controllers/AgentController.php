@@ -8,7 +8,6 @@ use App\Models\{
     Device,
     OneTimePassword,
     Billboard,
-    AgentNotification,
 };
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -263,6 +262,64 @@ class AgentController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Image uploaded successfully',
+        ]);
+    }
+
+    //All agent notifications
+    public function getNotifications(Request $request)
+    {
+        $agent = $request->user()->agent;
+
+        $notifications = $agent->notifications()
+            ->with(['agentNotificationType'])
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
+
+        return response()->json([
+            'status' => 'success',
+            'notifications' => $notifications
+        ]);
+    }
+    
+    //Unread notifications count
+    public function unreadNotificationsCount(Request $request)
+    {
+        $agent = $request->user()->agent;
+
+        $unreadCount = $agent->notifications()
+            ->unread()
+            ->count();
+
+        return response()->json([
+            'status' => 'success',
+            'unread_count' => $unreadCount
+        ]);
+    }
+
+    //notification details
+    public function notificationDetails(Request $request, $notificationId)
+    {
+        $agent = $request->user()->agent;
+
+        $notification = $agent->notifications()
+            ->where('id', $notificationId)
+            ->with(['type'])
+            ->first();
+
+        if ($notification && !$notification->read_at) {
+            $notification->markAsRead();
+        }
+
+        if (!$notification) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Notification not found'
+            ], 404);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'notification' => $notification
         ]);
     }
 }
