@@ -46,4 +46,9 @@ class AgentNotification extends Model
     {
         return $query->whereNotNull('read_at');
     }
+
+    public function markAsRead()
+    {
+        $this->update(['read_at' => now()]);
+    }
 }
