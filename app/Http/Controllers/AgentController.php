@@ -280,7 +280,7 @@ class AgentController extends Controller
             'notifications' => $notifications
         ]);
     }
-    
+
     //Unread notifications count
     public function unreadNotificationsCount(Request $request)
     {
@@ -303,7 +303,7 @@ class AgentController extends Controller
 
         $notification = $agent->notifications()
             ->where('id', $notificationId)
-            ->with(['type'])
+            ->with(['agentNotificationType'])
             ->first();
 
         if ($notification && !$notification->read_at) {
