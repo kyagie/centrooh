@@ -123,6 +123,16 @@ class User extends Authenticatable implements FilamentUser
         return $this->hasMany(BillboardImage::class)->where('uploader_type', 'user');
     }
 
+    public function agentNotifications()
+    {
+        return $this->hasMany(AgentNotification::class, 'created_by');
+    }
+
+    public function agentNotificationTypes()
+    {
+        return $this->hasMany(AgentNotificationType::class, 'created_by');
+    }
+
     public function canAccessPanel(Panel $panel): bool
     {
 	    return true;
