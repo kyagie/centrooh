@@ -126,6 +126,14 @@ class Agent extends Model
     }
 
     /**
+     * Get the agent's notifications.
+     */
+    public function notifications()
+    {
+        return $this->hasMany(AgentNotification::class);
+    }
+
+    /**
      * Generate a unique username based on the agent's first and last name.
      *
      * @param string $firstName The agent's first name
