@@ -25,6 +25,13 @@
             hard to bring you the new Centrooh experience. Stay tuned for updates!</p>
     </section>
 
+    <!-- Download from Play Store -->
+    <div class="flex flex-col items-center mb-12">
+        <a href="#" class="inline-block" aria-label="Download from Google Play Store">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" alt="Get it on Google Play" class="h-14 w-auto shadow-md hover:scale-105 transition-transform duration-200 rounded-lg">
+        </a>
+    </div>
+
 </body>
 
 </html>
