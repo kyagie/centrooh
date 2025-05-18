@@ -31,6 +31,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/agent/billboards/upload-image', [AgentController::class, 'uploadBillboardImage']);
         Route::get('/agent/billboards/coordinates', [BillboardController::class, 'getAgentBillboardCoordinates']);
         Route::get('/agent/billboards/{id}', [AgentController::class, 'getBillboardDetails']);
+        Route::get('/agent/statistics', [AgentController::class, 'getAgentStatistics']);
         
         // Notification routes
         Route::get('/agent/notifications', [AgentController::class, 'getNotifications']);

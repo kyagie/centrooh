@@ -276,7 +276,7 @@ class AgentController extends Controller
             ->with(['agentNotificationType'])
             ->orderBy('created_at', 'desc')
             ->get();
-        
+
         return response()->json([
             'status' => 'success',
             'notifications' => $notifications
@@ -322,6 +322,51 @@ class AgentController extends Controller
         return response()->json([
             'status' => 'success',
             'notification' => $notification
+        ]);
+    }
+
+    /**
+     * Get statistics for the authenticated agent.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getAgentStatistics(Request $request)
+    {
+        $agent = $request->user()->agent;
+        if (!$agent) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Agent not found.'
+            ], 404);
+        }
+
+        // Total billboards assigned
+        $totalAssigned = $agent->billboards()->count();
+
+        // Billboards in pending status
+        $pendingCount = $agent->billboards()->where('status', 'pending')->count();
+
+        // Billboards marked as rejected
+        $rejectedCount = $agent->billboards()->where('status', 'rejected')->count();
+
+        // Billboards updated this week (image submitted by agent)
+        $startOfWeek = now()->startOfWeek();
+        $endOfWeek = now()->endOfWeek();
+        $updatedBillboardIds = $agent->billboardImages()
+            ->whereBetween('created_at', [$startOfWeek, $endOfWeek])
+            ->pluck('billboard_id')
+            ->unique();
+        $updatedThisWeekCount = $updatedBillboardIds->count();
+
+        return response()->json([
+            'status' => 'success',
+            'statistics' => [
+                'total_assigned' => $totalAssigned,
+                'pending' => $pendingCount,
+                'rejected' => $rejectedCount,
+                'updated_this_week' => $updatedThisWeekCount
+            ],
         ]);
     }
 }
