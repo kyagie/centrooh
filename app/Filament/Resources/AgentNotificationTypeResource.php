@@ -17,7 +17,11 @@ class AgentNotificationTypeResource extends Resource
 {
     protected static ?string $model = AgentNotificationType::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-chat-bubble-left-ellipsis';
+
+    protected static ?string $navigationGroup = 'Notifications';
+
+    protected static ?string $navigationLabel = 'Notification Types';
 
     public static function form(Form $form): Form
     {
@@ -28,14 +32,14 @@ class AgentNotificationTypeResource extends Resource
                     ->maxLength(255),
                 Forms\Components\TextInput::make('description')
                     ->maxLength(255),
-                Forms\Components\TextInput::make('icon')
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('color')
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('status')
-                    ->required()
-                    ->maxLength(255)
-                    ->default('active'),
+                Forms\Components\ColorPicker::make('color'),
+                Forms\Components\Select::make('status')
+                    ->options([
+                        'active' => 'Active',
+                        'inactive' => 'Inactive',
+                    ])
+                    ->default('active')
+                    ->required(),
             ]);
     }
 
@@ -45,13 +49,15 @@ class AgentNotificationTypeResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('icon')
+                Tables\Columns\TextColumn::make('slug')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('color'),
-                Tables\Columns\TextColumn::make('status'),
-                Tables\Columns\TextColumn::make('created_by')
-                    ->numeric()
-                    ->sortable(),
+                Tables\Columns\ColorColumn::make('color'),
+                Tables\Columns\TextColumn::make('status')
+                    ->badge()
+                    ->color(fn(string $state): string => match ($state) {
+                        'active' => 'success',
+                        'inactive' => 'danger',
+                    }),
                 Tables\Columns\TextColumn::make('deleted_at')
                     ->dateTime()
                     ->sortable()

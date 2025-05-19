@@ -17,7 +17,10 @@ class AgentNotificationResource extends Resource
 {
     protected static ?string $model = AgentNotification::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-chat-bubble-left-right';
+
+    protected static ?string $navigationGroup = 'Notifications';
+    protected static ?string $navigationLabel = 'Agent Notifications';
 
     public static function form(Form $form): Form
     {
