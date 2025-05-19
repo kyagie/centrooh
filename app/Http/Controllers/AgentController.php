@@ -290,7 +290,7 @@ class AgentController extends Controller
         $agent = $request->user()->agent;
 
         $notifications = $agent->notifications()
-            ->unread()
+            // ->unread()
             ->with(['agentNotificationType'])
             ->orderBy('created_at', 'desc')
             ->get();
