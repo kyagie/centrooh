@@ -18,7 +18,7 @@ class EnsureUserIsAgent
         if (
             !$request->user() ||
             !$request->user()->agent ||
-            $request->user()->role !== 'agent'
+            !$request->user()->hasRole('agent')
         ) {
             return response()->json([
                 'message' => 'You must be an agent to access this resource.'
