@@ -29,7 +29,7 @@ class AdminPanelProvider extends PanelProvider
             ->login()
             ->plugins([
                 \BezhanSalleh\FilamentShield\FilamentShieldPlugin::make(),
-
+                \TomatoPHP\FilamentUsers\FilamentUsersPlugin::make()
             ])
             ->colors([
                 'primary' => Color::Amber,
