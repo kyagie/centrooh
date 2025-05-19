@@ -36,16 +36,6 @@ class AgentResource extends Resource
                     ->tel()
                     ->maxLength(255)
                     ->disabled(),
-                Forms\Components\Select::make('region_id')
-                    ->label('Region')
-                    ->relationship('region', 'name')
-                    ->searchable()
-                    ->required(),
-                Forms\Components\Select::make('district_id')
-                    ->label('District')
-                    ->relationship('district', 'name')
-                    ->searchable()
-                    ->required(),
                 Forms\Components\Select::make('status')
                     ->options([
                         'active' => 'Active',
@@ -81,7 +71,6 @@ class AgentResource extends Resource
                 Tables\Columns\TextColumn::make('user.email')
                     ->label('Email')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('region.name')->label('Region')->sortable(),
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
                     ->color(fn(string $state): string => match ($state) {
