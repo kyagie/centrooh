@@ -15,7 +15,11 @@ class EnsureUserIsAgent
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (!$request->user() || !$request->user()->agent) {
+        if (
+            !$request->user() ||
+            !$request->user()->agent ||
+            $request->user()->role !== 'agent'
+        ) {
             return response()->json([
                 'message' => 'You must be an agent to access this resource.'
             ], 403);
