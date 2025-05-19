@@ -17,33 +17,14 @@ class OneTimePasswordResource extends Resource
 {
     protected static ?string $model = OneTimePassword::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-key';
+    protected static ?string $navigationIcon = 'heroicon-o-lock-open';
+
+    protected static ?string $navigationGroup = 'Access Control';
 
     public static function form(Form $form): Form
     {
         return $form
-            ->schema([
-                Forms\Components\TextInput::make('phone_number')
-                    ->tel()
-                    ->required()
-                    ->maxLength(255)
-                    ->disabled(),
-                Forms\Components\TextInput::make('otp_code')
-                    ->required()
-                    ->maxLength(255)
-                    ->disabled(),
-                Forms\Components\Toggle::make('verified')
-                    ->required()
-                    ->disabled(),
-                Forms\Components\DateTimePicker::make('expires_at')
-                    ->required()
-                    ->disabled(),
-                Forms\Components\TextInput::make('attempts')
-                    ->required()
-                    ->numeric()
-                    ->default(0)
-                    ->disabled(),
-            ]);
+            ->schema([]);
     }
 
     public static function table(Table $table): Table
@@ -61,19 +42,17 @@ class OneTimePasswordResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('expired')
                     ->label('Expired')
-                    ->formatStateUsing(fn ($record) => $record->expires_at < now() ? 'Yes' : 'No'),
+                    ->formatStateUsing(fn($record) => $record->expires_at < now() ? 'Yes' : 'No'),
+                Tables\Columns\TextColumn::make('attempts')
+                    ->label('Attempts')
+                    ->sortable(),
             ])
+            ->poll('10s')
             ->filters([
                 //
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-            ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
-            ]);
+            ->actions([])
+            ->bulkActions([]);
     }
 
     public static function getRelations(): array
@@ -90,5 +69,10 @@ class OneTimePasswordResource extends Resource
             'create' => Pages\CreateOneTimePassword::route('/create'),
             'edit' => Pages\EditOneTimePassword::route('/{record}/edit'),
         ];
+    }
+
+    public static function canCreate(): bool
+    {
+        return false;
     }
 }
