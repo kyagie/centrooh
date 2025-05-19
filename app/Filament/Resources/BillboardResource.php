@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\BillboardResource\Pages;
 use App\Filament\Resources\BillboardResource\RelationManagers;
+use App\Filament\Resources\BillboardResource\RelationManagers\ImagesRelationManager;
 use App\Models\Billboard;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -19,6 +20,8 @@ class BillboardResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
+    protected static ?string $navigationGroup = 'Billboard Management';
+    
     public static function form(Form $form): Form
     {
         return $form
@@ -119,6 +122,7 @@ class BillboardResource extends Resource
     {
         return [
             //
+            ImagesRelationManager::class,
         ];
     }
 
