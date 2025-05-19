@@ -8,6 +8,8 @@ use App\Models\{
     Device,
     OneTimePassword,
     Billboard,
+    AgentNotificationType,
+    AgentNotification
 };
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -127,6 +129,22 @@ class AgentController extends Controller
             )->plainTextToken;
 
             DB::commit();
+
+            $notificationType = AgentNotificationType::firstOrCreate(
+                ['slug' => 'new-agent-registration'],
+                [
+                    'name' => 'New Agent Registration',
+                    'description' => 'Notification for new agent registration',
+                ]
+            );
+
+            AgentNotification::create([
+                'agent_id' => $agent->id,
+                'agent_notification_type_id' => $notificationType->id,
+                'title' => 'Registration Successful.',
+                'body' => 'You have been registered successfully. Your account is pending approval.',
+                'status' => 'unread',
+            ]);
 
             return response()->json([
                 'message' => 'Agent registered successfully',
