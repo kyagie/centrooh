@@ -82,7 +82,7 @@ class User extends Authenticatable implements FilamentUser
     {
         return $this->hasMany(Agent::class, 'user_id');
     }
-    
+
     /**
      * Get the regions created by the user.
      */
@@ -90,7 +90,7 @@ class User extends Authenticatable implements FilamentUser
     {
         return $this->hasMany(Region::class, 'created_by');
     }
-    
+
     /**
      * Get the districts created by the user.
      */
@@ -98,7 +98,7 @@ class User extends Authenticatable implements FilamentUser
     {
         return $this->hasMany(District::class, 'created_by');
     }
-    
+
     /**
      * Get the billboards created by the user.
      */
@@ -106,7 +106,7 @@ class User extends Authenticatable implements FilamentUser
     {
         return $this->hasMany(Billboard::class, 'created_by');
     }
-    
+
     /**
      * Get the billboards reviewed by the user.
      */
@@ -114,7 +114,7 @@ class User extends Authenticatable implements FilamentUser
     {
         return $this->hasMany(Billboard::class, 'reviewed_by');
     }
-    
+
     /**
      * Get billboard images uploaded by the user.
      */
@@ -135,6 +135,9 @@ class User extends Authenticatable implements FilamentUser
 
     public function canAccessPanel(Panel $panel): bool
     {
-	    return true;
+        return str_ends_with($this->email, '@centrooh.app') && $this->user()->hasRole([
+            'admin',
+            'super-admin',
+        ]);
     }
 }
