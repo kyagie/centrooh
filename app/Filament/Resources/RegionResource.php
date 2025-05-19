@@ -17,7 +17,9 @@ class RegionResource extends Resource
 {
     protected static ?string $model = Region::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-map';
+    protected static ?string $navigationIcon = 'heroicon-o-map-pin';
+
+    protected static ?string $navigationGroup = 'Administration';
 
     public static function form(Form $form): Form
     {
@@ -26,12 +28,13 @@ class RegionResource extends Resource
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('status')
-                    ->required()
-                    ->maxLength(255)
-                    ->default('active'),
-                Forms\Components\TextInput::make('created_by')
-                    ->numeric(),
+                Forms\Components\Select::make('status')
+                    ->options([
+                        'active' => 'Active',
+                        'inactive' => 'Inactive',
+                    ])
+                    ->default('active')
+                    ->required(),
             ]);
     }
 
@@ -42,10 +45,11 @@ class RegionResource extends Resource
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('status')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('created_by')
-                    ->numeric()
-                    ->sortable(),
+                    ->badge()
+                    ->color(fn(string $state): string => match ($state) {
+                        'active' => 'success',
+                        'inactive' => 'danger',
+                    }),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
