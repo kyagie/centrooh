@@ -11,6 +11,7 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class AgentResource extends Resource
@@ -70,16 +71,28 @@ class AgentResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('username')->searchable(),
-                Tables\Columns\TextColumn::make('phone_number')->searchable(),
-                Tables\Columns\TextColumn::make('region.name')->label('Region')->sortable(),
-                Tables\Columns\TextColumn::make('user.name')->label('Full Name')->sortable(),
-                Tables\Columns\TextColumn::make('status')->sortable(),
                 Tables\Columns\ImageColumn::make('profile_picture')
-                    ->label('Profile Picture')
-                    ->disk('public')
+                    ->defaultImageUrl(url('https://placehold.co/600x400'))
                     ->circular(),
+                Tables\Columns\TextColumn::make('user.name')->label('Full Name')->sortable(),
+                Tables\Columns\TextColumn::make('phone_number')->searchable(),
+                Tables\Columns\TextColumn::make('username')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('user.email')
+                    ->label('Email')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('region.name')->label('Region')->sortable(),
+                Tables\Columns\TextColumn::make('status')
+                    ->badge()
+                    ->color(fn(string $state): string => match ($state) {
+                        'active' => 'success',
+                        'inactive' => 'warning',
+                        'suspended' => 'danger',
+                    })
+                    ->sortable(),
             ])
+            ->defaultSort('created_at', 'desc')
+            ->poll('30s')
             ->filters([
                 //
             ])
@@ -87,9 +100,9 @@ class AgentResource extends Resource
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
+                // Tables\Actions\BulkActionGroup::make([
+                    // Tables\Actions\DeleteBulkAction::make(),
+                // ]),
             ]);
     }
 
@@ -107,5 +120,10 @@ class AgentResource extends Resource
             'create' => Pages\CreateAgent::route('/create'),
             'edit' => Pages\EditAgent::route('/{record}/edit'),
         ];
+    }
+
+    public static function canCreate(): bool
+    {
+        return false;
     }
 }

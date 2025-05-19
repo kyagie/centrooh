@@ -26,22 +26,32 @@ class AgentNotificationResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('agent_id')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('agent_notification_type_id')
-                    ->required()
-                    ->numeric(),
+                Forms\Components\Select::make('agent_id')
+                    ->relationship('agent.user', 'name')
+                    ->searchable([
+                        'name'
+                    ])
+                    ->searchPrompt('Search by name')
+                    ->searchingMessage('Searching...')
+                    ->noSearchResultsMessage('No results found')
+                    ->required(),
+                Forms\Components\Select::make('agent_notification_type_id')
+                    ->label('Notification Type')
+                    ->relationship('agentNotificationType', 'name')
+                    ->relationship('agentNotificationType', 'name')
+                    ->searchable([
+                        'name'
+                    ])
+                    ->searchPrompt('Search by name')
+                    ->searchingMessage('Searching...')
+                    ->noSearchResultsMessage('No results found')
+                    ->required(),
                 Forms\Components\TextInput::make('title')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\Textarea::make('body')
+                Forms\Components\RichEditor::make('body')
                     ->required()
                     ->columnSpanFull(),
-                Forms\Components\TextInput::make('meta'),
-                Forms\Components\DateTimePicker::make('read_at'),
-                Forms\Components\TextInput::make('created_by')
-                    ->numeric(),
             ]);
     }
 
@@ -49,20 +59,18 @@ class AgentNotificationResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('agent_id')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('agent_notification_type_id')
-                    ->numeric()
-                    ->sortable(),
+                Tables\Columns\TextColumn::make('agent.user.name')
+                    ->label('Agent Name')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('agentNotificationType.name')
+                    ->label('Notification Type')
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('title')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('read_at')
                     ->dateTime()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('created_by')
-                    ->numeric()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('deleted_at')
                     ->dateTime()
                     ->sortable()

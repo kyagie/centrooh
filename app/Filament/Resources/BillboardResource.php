@@ -29,10 +29,16 @@ class BillboardResource extends Resource
                 Forms\Components\Select::make('status')
                     ->options([
                         'pending' => 'Pending',
-                        'approved' => 'Approved',
+                        'updated' => 'Updated',
                         'rejected' => 'Rejected',
+                        'in_review' => 'In Review',
+                        'passed' => 'Passed',
                     ])
                     ->required(),
+                Forms\Components\Select::make('agent_id')
+                    ->label('Assigned Agent')
+                    ->relationship('agent', 'username')
+                    ->searchable(),
                 Forms\Components\Toggle::make('is_active')
                     ->required(),
                 Forms\Components\Textarea::make('address')
@@ -43,27 +49,21 @@ class BillboardResource extends Resource
                     ->numeric(),
                 Forms\Components\TextInput::make('longitude')
                     ->numeric(),
-                Forms\Components\TextInput::make('update_interval')
-                    ->required()
-                    ->maxLength(255)
+                Forms\Components\Select::make('update_interval')
+                    ->options([
+                        'daily' => 'Daily',
+                        'weekly' => 'Weekly',
+                        'biweekly' => 'Biweekly',
+                        'monthly' => 'Monthly',
+                        'bimonthly' => 'Bimonthly',
+                        'quarterly' => 'Quarterly',
+                    ])
                     ->default('monthly'),
                 Forms\Components\Select::make('district_id')
                     ->label('District')
                     ->relationship('district', 'name')
                     ->searchable()
                     ->required(),
-                Forms\Components\Select::make('agent_id')
-                    ->label('Agent')
-                    ->relationship('agent', 'username')
-                    ->searchable(),
-                Forms\Components\Select::make('created_by')
-                    ->label('Created By')
-                    ->relationship('creator', 'name')
-                    ->searchable(),
-                Forms\Components\Select::make('reviewed_by')
-                    ->label('Reviewed By')
-                    ->relationship('reviewer', 'name')
-                    ->searchable(),
             ]);
     }
 
@@ -74,26 +74,23 @@ class BillboardResource extends Resource
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('status')
-                    ->searchable(),
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'pending' => 'warning',
+                        'updated' => 'success',
+                        'rejected' => 'danger',
+                        'in_review' => 'primary',
+                        'passed' => 'success',
+                    })
+                    ->sortable(),
                 Tables\Columns\IconColumn::make('is_active')
+                    ->label('Active')
                     ->boolean(),
-                Tables\Columns\TextColumn::make('latitude')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('longitude')
-                    ->numeric()
-                    ->sortable(),
                 Tables\Columns\TextColumn::make('district.name')
                     ->label('District')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('agent.username')
-                    ->label('Agent')
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('createdBy.name')
-                    ->label('Created By')
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('reviewedBy.name')
-                    ->label('Reviewed By')
+                Tables\Columns\TextColumn::make('agent.user.name')
+                    ->label('Agent Assigned')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
@@ -115,9 +112,6 @@ class BillboardResource extends Resource
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
             ]);
     }
 
