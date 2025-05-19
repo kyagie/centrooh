@@ -85,21 +85,6 @@ class Agent extends Model
         return $this->belongsTo(User::class, 'approved_by');
     }
 
-    /**
-     * Get the region associated with the agent.
-     */
-    public function region()
-    {
-        return $this->belongsTo(Region::class);
-    }
-
-    /**
-     * Get the district associated with the agent.
-     */
-    public function district()
-    {
-        return $this->belongsTo(District::class);
-    }
 
     /**
      * Get the devices associated with the agent.
@@ -131,6 +116,22 @@ class Agent extends Model
     public function notifications()
     {
         return $this->hasMany(AgentNotification::class);
+    }
+
+    /**
+     * The districts this agent is assigned to.
+     */
+    public function districts()
+    {
+        return $this->belongsToMany(District::class, 'agent_districts');
+    }
+
+    /**
+     * The agent-district pivot records for this agent.
+     */
+    public function agentDistricts()
+    {
+        return $this->hasMany(AgentDistrict::class);
     }
 
     /**
