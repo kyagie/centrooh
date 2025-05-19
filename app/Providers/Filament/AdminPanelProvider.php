@@ -17,6 +17,7 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Filament\FontProviders\LocalFontProvider;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -32,8 +33,14 @@ class AdminPanelProvider extends PanelProvider
                 \TomatoPHP\FilamentUsers\FilamentUsersPlugin::make()
             ])
             ->colors([
-                'primary' => Color::Amber,
+                'primary' => '#041123',
             ])
+            ->font(
+                'Exo2-Bold',
+                url: asset('assets/fonts/Exo2-Bold.otf'),
+                provider: LocalFontProvider::class,
+            )
+            ->brandLogo(asset('assets/images/logo.png'))
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
