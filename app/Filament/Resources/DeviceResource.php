@@ -11,67 +11,49 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class DeviceResource extends Resource
 {
     protected static ?string $model = Device::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-phone';
+    protected static ?string $navigationIcon = 'heroicon-o-device-phone-mobile';
+
+    protected static ?string $navigationGroup = 'Access Control';
 
     public static function form(Form $form): Form
     {
         return $form
-            ->schema([
-                Forms\Components\TextInput::make('device_type')
-                    ->maxLength(255)
-                    ->disabled(),
-                Forms\Components\TextInput::make('brand')
-                    ->maxLength(255)
-                    ->disabled(),
-                Forms\Components\TextInput::make('name')
-                    ->required()
-                    ->maxLength(255)
-                    ->disabled(),
-                Forms\Components\Select::make('agent_id')
-                    ->label('Agent')
-                    ->relationship('agent', 'username')
-                    ->searchable()
-                    ->required()
-                    ->disabled(),
-                Forms\Components\Toggle::make('active')
-                    ->required()
-                    ->disabled(),
-            ]);
+            ->schema([]);
     }
 
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('agent.user.name')
+                    ->label('Agent')
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('device_type')
+                    ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('brand')
+                    ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('agent.username')
-                    ->label('Agent')
-                    ->sortable(),
                 Tables\Columns\IconColumn::make('active')
+                    ->sortable()
                     ->boolean(),
             ])
+            ->defaultSort('created_at', 'desc')
+            ->poll('10s')
             ->filters([
                 //
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-            ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
-            ]);
+            ->actions([])
+            ->bulkActions([]);
     }
 
     public static function getRelations(): array
@@ -88,5 +70,15 @@ class DeviceResource extends Resource
             'create' => Pages\CreateDevice::route('/create'),
             'edit' => Pages\EditDevice::route('/{record}/edit'),
         ];
+    }
+
+    public static function canCreate(): bool
+    {
+        return false;
+    }
+
+    public static function canEdit(Model $record): bool
+    {
+        return false;
     }
 }

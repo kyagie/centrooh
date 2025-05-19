@@ -11,6 +11,7 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class OneTimePasswordResource extends Resource
@@ -47,6 +48,7 @@ class OneTimePasswordResource extends Resource
                     ->label('Attempts')
                     ->sortable(),
             ])
+            ->defaultSort('created_at', 'desc')
             ->poll('10s')
             ->filters([
                 //
@@ -72,6 +74,11 @@ class OneTimePasswordResource extends Resource
     }
 
     public static function canCreate(): bool
+    {
+        return false;
+    }
+
+    public static function canEdit(Model $record): bool
     {
         return false;
     }
