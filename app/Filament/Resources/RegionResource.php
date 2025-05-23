@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Imports\RegionImporter;
 use App\Filament\Resources\RegionResource\Pages;
 use App\Filament\Resources\RegionResource\RelationManagers;
 use App\Models\Region;
@@ -12,6 +13,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Tables\Actions\ImportAction;
 
 class RegionResource extends Resource
 {
@@ -41,6 +43,10 @@ class RegionResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->headerActions([
+                ImportAction::make()
+                    ->importer(RegionImporter::class)
+            ])
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),
