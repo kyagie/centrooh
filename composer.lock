@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2f2f1159413856159b4ad4dc28d84480",
+    "content-hash": "d03af87a941bb1675739453b0ff02fcf",
     "packages": [
         {
             "name": "africastalking/africastalking",
@@ -2544,56 +2544,6 @@
                 "source": "https://github.com/kirschbaum-development/eloquent-power-joins/tree/4.2.3"
             },
             "time": "2025-04-01T14:41:56+00:00"
-        },
-        {
-            "name": "kyagie/laravel-auditing-filesystem",
-            "version": "v1.0.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/kyagie/laravel-auditing-filesystem.git",
-                "reference": "5a18f81ea673a6d891f0d739926c6bfea22be78c"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/kyagie/laravel-auditing-filesystem/zipball/5a18f81ea673a6d891f0d739926c6bfea22be78c",
-                "reference": "5a18f81ea673a6d891f0d739926c6bfea22be78c",
-                "shasum": ""
-            },
-            "require": {
-                "ext-json": "*",
-                "league/csv": "^9.16",
-                "league/flysystem": "^3.29",
-                "owen-it/laravel-auditing": "^14.0",
-                "php": "^8.3"
-            },
-            "require-dev": {
-                "league/flysystem": "^3.29",
-                "league/flysystem-aws-s3-v3": "^3.29",
-                "nesbot/carbon": "^3.8",
-                "orchestra/testbench": "^9.5",
-                "phpunit/phpunit": "^11"
-            },
-            "type": "package",
-            "autoload": {
-                "psr-4": {
-                    "Kyagie\\Auditing\\Drivers\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Arthur Kyagulanyi",
-                    "email": "kyagieboy99@gmail.com"
-                }
-            ],
-            "description": "A filesystem driver for the owen-it/laravel-auditing package. Allows storage of the audits in CSV files, across all registered Laravel disks.",
-            "support": {
-                "source": "https://github.com/kyagie/laravel-auditing-filesystem/tree/v1.0.1"
-            },
-            "time": "2025-05-23T15:12:36+00:00"
         },
         {
             "name": "lab404/laravel-impersonate",
