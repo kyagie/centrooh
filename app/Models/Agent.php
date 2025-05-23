@@ -7,10 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Storage;
+use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
+use OwenIt\Auditing\Auditable;
 
-class Agent extends Model
+class Agent extends Model implements AuditableContract
 {
-    use HasFactory, SoftDeletes, Notifiable;
+    use HasFactory, SoftDeletes, Notifiable, Auditable;
 
     /**
      * Guarded attributes.
@@ -40,17 +42,6 @@ class Agent extends Model
         'approved_by',
         'region_id',
         'district_id'
-    ];
-
-    /**
-     * The attributes that should be hidden for arrays.
-     *
-     * @var array<int, string>
-     */
-    protected $hidden = [
-        'created_by',
-        'approved_by',
-        'deleted_at'
     ];
 
     protected $appends = ['profile_picture_url'];
