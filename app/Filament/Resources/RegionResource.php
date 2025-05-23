@@ -43,10 +43,10 @@ class RegionResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->headerActions([
-                ImportAction::make()
-                    ->importer(RegionImporter::class)
-            ])
+            // ->headerActions([
+            //     ImportAction::make()
+            //         ->importer(RegionImporter::class)
+            // ])
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),
