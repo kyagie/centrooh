@@ -11,11 +11,13 @@ use Laravel\Sanctum\HasApiTokens;
 use App\Models\Agent;
 use Filament\Panel;
 use Filament\Models\Contracts\FilamentUser;
+use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
+use OwenIt\Auditing\Auditable;
 
-class User extends Authenticatable implements FilamentUser
+class User extends Authenticatable implements FilamentUser, AuditableContract
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, HasRoles, HasApiTokens;
+    use HasFactory, Notifiable, HasRoles, HasApiTokens, Auditable;
 
     /**
      * The attributes that are mass assignable.

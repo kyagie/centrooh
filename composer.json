@@ -16,6 +16,7 @@
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.10.1",
         "league/flysystem-aws-s3-v3": "^3.0",
+        "owen-it/laravel-auditing": "^14.0",
         "spatie/laravel-permission": "^6.17",
         "stechstudio/filament-impersonate": "^3.16",
         "tomatophp/filament-users": "^2.0"
