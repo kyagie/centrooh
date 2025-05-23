@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Imports\BillboardImporter;
 use App\Filament\Resources\BillboardResource\Pages;
 use App\Filament\Resources\BillboardResource\RelationManagers;
 use App\Filament\Resources\BillboardResource\RelationManagers\ImagesRelationManager;
@@ -13,6 +14,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Tables\Actions\ImportAction;
 
 class BillboardResource extends Resource
 {
@@ -73,6 +75,10 @@ class BillboardResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->headerActions([
+                ImportAction::make()
+                    ->importer(BillboardImporter::class)
+            ])
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),
