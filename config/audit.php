@@ -1,5 +1,7 @@
 <?php
 
+use App\AuditDrivers\BucketDriver;
+
 return [
 
     'enabled' => env('AUDITING_ENABLED', true),
@@ -117,7 +119,7 @@ return [
     | issues when storing large amounts of data. You can override this by
     | setting allow_array_values to true.
     */
-    'allowed_array_values' => false,
+    'allowed_array_values' => true,
 
     /*
     |--------------------------------------------------------------------------
@@ -128,7 +130,7 @@ return [
     |
     */
 
-    'timestamps' => false,
+    'timestamps' => true,
 
     /*
     |--------------------------------------------------------------------------
@@ -151,7 +153,7 @@ return [
     |
     */
 
-    'driver' => env('AUDIT_DRIVER', 'database'),
+    'driver' => BucketDriver::class,
 
     /*
     |--------------------------------------------------------------------------
@@ -167,12 +169,6 @@ return [
             'table' => 'audits',
             'connection' => null,
         ],
-        'filesystem' => [
-            'disk'         => 'do',
-            'dir'          => 'audits',
-            'filename'     => 'audit.csv',
-            'logging_type' => 'single',
-        ],
     ],
 
     /*
@@ -185,9 +181,9 @@ return [
     */
 
     'queue' => [
-        'enable' => false,
-        'connection' => 'sync',
-        'queue' => 'default',
+        'enable' => true,
+        'connection' => 'redis',
+        'queue' => 'audit',
         'delay' => 0,
     ],
 
