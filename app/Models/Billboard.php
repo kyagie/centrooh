@@ -11,7 +11,7 @@ use OwenIt\Auditing\Auditable;
 class Billboard extends Model implements AuditableContract
 {
     use HasFactory, SoftDeletes, Auditable;
-    
+
     /**
      * The attributes that are mass assignable.
      *
@@ -22,7 +22,7 @@ class Billboard extends Model implements AuditableContract
         'status',
         'is_active',
         'address',
-        'location',
+        'area',
         'latitude',
         'longitude',
         'update_interval',
@@ -30,8 +30,14 @@ class Billboard extends Model implements AuditableContract
         'agent_id',
         'created_by',
         'reviewed_by',
+        'location'
     ];
-    
+
+
+    protected $appends = [
+        'location',
+    ];
+
     /**
      * The attributes that should be cast.
      *
@@ -42,7 +48,7 @@ class Billboard extends Model implements AuditableContract
         'latitude' => 'float',
         'longitude' => 'float',
     ];
-    
+
     /**
      * Get the district that owns the billboard.
      */
@@ -50,7 +56,7 @@ class Billboard extends Model implements AuditableContract
     {
         return $this->belongsTo(District::class);
     }
-    
+
     /**
      * Get the agent assigned to the billboard.
      */
@@ -58,7 +64,7 @@ class Billboard extends Model implements AuditableContract
     {
         return $this->belongsTo(Agent::class);
     }
-    
+
     /**
      * Get the user who created the billboard.
      */
@@ -66,7 +72,7 @@ class Billboard extends Model implements AuditableContract
     {
         return $this->belongsTo(User::class, 'created_by');
     }
-    
+
     /**
      * Get the user who reviewed the billboard.
      */
@@ -74,7 +80,7 @@ class Billboard extends Model implements AuditableContract
     {
         return $this->belongsTo(User::class, 'reviewed_by');
     }
-    
+
     /**
      * Get the site code for this billboard.
      */
@@ -82,7 +88,7 @@ class Billboard extends Model implements AuditableContract
     {
         return $this->hasOne(BillboardSiteCode::class);
     }
-    
+
     /**
      * Get the review notes for this billboard.
      */
@@ -90,7 +96,7 @@ class Billboard extends Model implements AuditableContract
     {
         return $this->hasMany(BillboardReviewNote::class);
     }
-    
+
     /**
      * Get all images for this billboard.
      */
@@ -98,7 +104,7 @@ class Billboard extends Model implements AuditableContract
     {
         return $this->hasMany(BillboardImage::class);
     }
-    
+
     /**
      * Get the primary image for this billboard.
      */
@@ -106,7 +112,7 @@ class Billboard extends Model implements AuditableContract
     {
         return $this->hasOne(BillboardImage::class)->where('is_primary', true);
     }
-    
+
     /**
      * Scope a query to only include active billboards.
      */
@@ -114,12 +120,42 @@ class Billboard extends Model implements AuditableContract
     {
         return $query->where('is_active', true);
     }
-    
+
     /**
      * Scope a query to filter billboards by status.
      */
     public function scopeStatus($query, $status)
     {
         return $query->where('status', $status);
+    }
+
+    public function getLocationAttribute(): array
+    {
+        return [
+            "lat" => (float)$this->latitude,
+            "lng" => (float)$this->longitude,
+        ];
+    }
+
+    // public function setLocationAttribute(?array $location): void
+    // {
+    //     if (is_array($location)) {
+    //         $this->attributes['latitude'] = $location['lat'];
+    //         $this->attributes['longitude'] = $location['lng'];
+    //         unset($this->attributes['location']);
+    //     }
+    // }
+
+    public static function getLatLngAttributes(): array
+    {
+        return [
+            'lat' => 'latitude',
+            'lng' => 'longitude',
+        ];
+    }
+
+    public static function getComputedLocation(): string
+    {
+        return 'location';
     }
 }

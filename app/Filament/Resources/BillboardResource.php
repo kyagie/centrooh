@@ -7,6 +7,8 @@ use App\Filament\Resources\BillboardResource\Pages;
 use App\Filament\Resources\BillboardResource\RelationManagers;
 use App\Filament\Resources\BillboardResource\RelationManagers\ImagesRelationManager;
 use App\Models\Billboard;
+use App\Models\District;
+use Cheesegrits\FilamentGoogleMaps\Fields\Map;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -23,7 +25,7 @@ class BillboardResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     protected static ?string $navigationGroup = 'Billboard Management';
-    
+
     public static function form(Form $form): Form
     {
         return $form
@@ -46,14 +48,6 @@ class BillboardResource extends Resource
                     ->searchable(),
                 Forms\Components\Toggle::make('is_active')
                     ->required(),
-                Forms\Components\Textarea::make('address')
-                    ->columnSpanFull(),
-                Forms\Components\Textarea::make('location')
-                    ->columnSpanFull(),
-                Forms\Components\TextInput::make('latitude')
-                    ->numeric(),
-                Forms\Components\TextInput::make('longitude')
-                    ->numeric(),
                 Forms\Components\Select::make('update_interval')
                     ->options([
                         'daily' => 'Daily',
@@ -66,9 +60,70 @@ class BillboardResource extends Resource
                     ->default('monthly'),
                 Forms\Components\Select::make('district_id')
                     ->label('District')
-                    ->relationship('district', 'name')
+                    ->options(District::get()->pluck('name', 'id')->toArray())
                     ->searchable()
                     ->required(),
+                Forms\Components\Textarea::make('address')
+                    ->label('Address')
+                    ->autosize()
+                    ->maxLength(1024)
+                    ->required(),
+                Forms\Components\TextInput::make('area')
+                    ->label('Location')
+                    ->placeholder('Start typing to search for a location')
+                    ->maxLength(1024)
+                    ->required(),
+                Map::make('map')
+                    ->reactive()
+                    ->afterStateUpdated(function ($state, callable $get, callable $set) {
+                        $set('lat', $state['lat']);
+                        $set('lng', $state['lng']);
+                    })
+                    ->mapControls([
+                        'mapTypeControl'    => false,
+                        'scaleControl'      => true,
+                        'streetViewControl' => false,
+                        'rotateControl'     => false,
+                        'fullscreenControl' => true,
+                        'searchBoxControl'  => false,
+                        'zoomControl'       => true,
+                    ])
+                    ->height(fn() => '800px')
+                    ->defaultZoom(12)
+                    ->defaultLocation(fn($record) => [
+                        $record->lat ?? 0.3401327,
+                        $record->lng ?? 32.5864384,
+                    ])
+                    ->draggable()
+                    ->clickable(false)
+                    ->autocomplete('area', placeField: 'name', types: [
+                        'geocode',
+                        'establishment',
+                    ], countries: ['UG'])
+                    ->autocompleteReverse()
+                    ->geolocate()
+                    ->geolocateOnLoad(true, false)
+                    ->columnSpanFull(),
+                Forms\Components\TextInput::make('lat')
+                    ->label('Latitude')
+                    ->reactive()
+                    ->afterStateUpdated(function ($state, callable $get, callable $set) {
+                        $set('map', [
+                            'lat' => floatVal($state),
+                            'lng' => floatVal($get('longitude')),
+                        ]);
+                    })
+                    ->lazy(),
+                Forms\Components\TextInput::make('lng')
+                    ->label('Longitude')
+                    ->reactive()
+                    ->afterStateUpdated(function ($state, callable $get, callable $set) {
+                        $set('map', [
+                            'lat' => floatval($get('latitude')),
+                            'lng' => floatVal($state),
+                        ]);
+                    })
+                    ->lazy(),
             ]);
     }
 
@@ -84,7 +139,7 @@ class BillboardResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn(string $state): string => match ($state) {
                         'pending' => 'warning',
                         'updated' => 'success',
                         'rejected' => 'danger',
@@ -120,8 +175,7 @@ class BillboardResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make(),
             ])
-            ->bulkActions([
-            ]);
+            ->bulkActions([]);
     }
 
     public static function getRelations(): array
