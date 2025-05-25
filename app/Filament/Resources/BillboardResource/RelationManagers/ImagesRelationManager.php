@@ -18,33 +18,47 @@ class ImagesRelationManager extends RelationManager
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('billboard_id')
-                    ->required()
-                    ->maxLength(255),
+                // Forms\Components\TextInput::make('billboard_id')
+                //     ->required()
+                //     ->maxLength(255),
             ]);
     }
 
     public function table(Table $table): Table
     {
         return $table
-            ->recordTitleAttribute('billboard_id')
+            ->recordTitleAttribute('name')
             ->columns([
-                Tables\Columns\TextColumn::make('billboard_id'),
+                Tables\Columns\ImageColumn::make('image_path')->simpleLightbox(),
+                Tables\Columns\TextColumn::make('status')
+                    ->badge()
+                    ->sortable()
+                    ->color(fn(string $state): string => match ($state) {
+                        'active' => 'success',
+                        'pending' => 'warning',
+                        'reviewed' => 'primary',
+                        'rejected' => 'danger',
+                        'in_review' => 'info',
+                        'passed' => 'success',
+                        'updated' => 'secondary',
+                        default => 'secondary',
+                    }),
+
             ])
             ->filters([
                 //
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make(),
+                // Tables\Actions\CreateAction::make(),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                // Tables\Actions\EditAction::make(),
+                // Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
+                // Tables\Actions\BulkActionGroup::make([
+                    // Tables\Actions\DeleteBulkAction::make(),
+                // ]),
             ]);
     }
 }
