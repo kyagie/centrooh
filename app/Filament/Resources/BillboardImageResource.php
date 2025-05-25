@@ -20,33 +20,40 @@ class BillboardImageResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     protected static ?string $navigationGroup = 'Billboard Management';
-    
+
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('billboard_id')
-                    ->required()
-                    ->numeric(),
+                Forms\Components\Select::make('billboard_id')
+                    ->label('Billboard Name')
+                    ->relationship('billboard', 'name')
+                    ->searchable()
+                    ->required(),
                 Forms\Components\FileUpload::make('image_path')
                     ->image()
-                    ->required(),
-                Forms\Components\FileUpload::make('image_type')
-                    ->image(),
-                Forms\Components\TextInput::make('status')
-                    ->required()
-                    ->maxLength(255)
+                    ->disk('do')
+                    ->imageEditor()
+                    ->visibility('public')
+                    ->imageEditorAspectRatios([
+                        null,
+                        '16:9',
+                        '4:3',
+                        '1:1',
+                    ]),
+                Forms\Components\TextInput::make('image_type'),
+                Forms\Components\Select::make('status')
+                    ->options([
+                        'active' => 'Active',
+                        'inactive' => 'Inactive',
+                    ])
                     ->default('active'),
-                Forms\Components\Toggle::make('is_primary')
+                Forms\Components\Select::make('agent_id')
+                    ->label('Agent Assigned')
+                    ->relationship('agent', 'username')
+                    ->searchable()
                     ->required(),
-                Forms\Components\TextInput::make('uploader_type')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('user_id')
-                    ->numeric(),
-                Forms\Components\TextInput::make('agent_id')
-                    ->numeric(),
-                Forms\Components\TextInput::make('meta'),
+                // Forms\Components\TextInput::make('meta'),
             ]);
     }
 
@@ -54,23 +61,20 @@ class BillboardImageResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('billboard_id')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\ImageColumn::make('image_path'),
-                Tables\Columns\ImageColumn::make('image_type'),
-                Tables\Columns\TextColumn::make('status')
-                    ->searchable(),
-                Tables\Columns\IconColumn::make('is_primary')
-                    ->boolean(),
-                Tables\Columns\TextColumn::make('uploader_type')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('user_id')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('agent_id')
-                    ->numeric()
-                    ->sortable(),
+                Tables\Columns\TextColumn::make('billboard.name'),
+                Tables\Columns\ImageColumn::make('image_path')->simpleLightbox(),
+                // Tables\Columns\ImageColumn::make('image_type'),
+                Tables\Columns\TextColumn::make('status'),
+                // Tables\Columns\TextColumn::make('uploader_type'),
+                // ->searchable(),
+                // Tables\Columns\TextColumn::make('user_id')
+                // ->numeric()
+                // ->sortable(),
+                // Tables\Columns\TextColumn::make('agent.username')
+                    // ->label('A')
+                    // ->searchable(),
+                // ->numeric()
+                // ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

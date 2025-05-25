@@ -18,6 +18,7 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Filament\FontProviders\LocalFontProvider;
+use SolutionForest\FilamentSimpleLightBox\SimpleLightBoxPlugin;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -30,7 +31,8 @@ class AdminPanelProvider extends PanelProvider
             ->login()
             ->plugins([
                 \BezhanSalleh\FilamentShield\FilamentShieldPlugin::make(),
-                \TomatoPHP\FilamentUsers\FilamentUsersPlugin::make()
+                \TomatoPHP\FilamentUsers\FilamentUsersPlugin::make(),
+                SimpleLightBoxPlugin::make()
             ])
             ->colors([
                 'primary' => '#041123',
