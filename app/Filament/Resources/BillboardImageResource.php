@@ -35,19 +35,25 @@ class BillboardImageResource extends Resource
                     ->disk('do')
                     ->imageEditor()
                     ->visibility('public')
+                    ->downloadable()
                     ->imageEditorAspectRatios([
                         null,
                         '16:9',
                         '4:3',
                         '1:1',
                     ]),
-                Forms\Components\TextInput::make('image_type'),
+                // Forms\Components\TextInput::make('image_type'),
                 Forms\Components\Select::make('status')
                     ->options([
                         'active' => 'Active',
-                        'inactive' => 'Inactive',
+                        'pending' => 'Pending',
+                        'reviewed' => 'Reviewed',
+                        'rejected' => 'Rejected',
+                        'in_review' => 'In Review',
+                        'passed' => 'Passed',
+                        'updated' => 'Updated',
                     ])
-                    ->default('active'),
+                    ->default('pending'),
                 Forms\Components\Select::make('agent_id')
                     ->label('Agent Assigned')
                     ->relationship('agent', 'username')
@@ -64,15 +70,27 @@ class BillboardImageResource extends Resource
                 Tables\Columns\TextColumn::make('billboard.name'),
                 Tables\Columns\ImageColumn::make('image_path')->simpleLightbox(),
                 // Tables\Columns\ImageColumn::make('image_type'),
-                Tables\Columns\TextColumn::make('status'),
+                Tables\Columns\TextColumn::make('status')
+                    ->badge()
+                    ->sortable()
+                    ->color(fn(string $state): string => match ($state) {
+                        'active' => 'success',
+                        'pending' => 'warning',
+                        'reviewed' => 'primary',
+                        'rejected' => 'danger',
+                        'in_review' => 'info',
+                        'passed' => 'success',
+                        'updated' => 'secondary',
+                        default => 'secondary',
+                    }),
                 // Tables\Columns\TextColumn::make('uploader_type'),
                 // ->searchable(),
                 // Tables\Columns\TextColumn::make('user_id')
                 // ->numeric()
                 // ->sortable(),
                 // Tables\Columns\TextColumn::make('agent.username')
-                    // ->label('A')
-                    // ->searchable(),
+                // ->label('A')
+                // ->searchable(),
                 // ->numeric()
                 // ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
