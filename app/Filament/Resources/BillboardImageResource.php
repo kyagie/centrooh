@@ -32,6 +32,7 @@ class BillboardImageResource extends Resource
                     ->searchable()
                     ->required(),
                 Forms\Components\FileUpload::make('image_path')
+                    ->label('Image')
                     ->image()
                     ->disk('do')
                     ->imageEditor()
@@ -58,8 +59,7 @@ class BillboardImageResource extends Resource
                 Forms\Components\Select::make('agent_id')
                     ->label('Agent Assigned')
                     ->relationship('agent', 'username')
-                    ->searchable()
-                    ->required(),
+                    ->searchable(),
                 // Forms\Components\TextInput::make('meta'),
             ]);
     }
