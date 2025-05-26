@@ -9,6 +9,7 @@
         "php": "^8.2",
         "africastalking/africastalking": "^3.0",
         "bezhansalleh/filament-shield": "^3.3",
+        "cheesegrits/filament-google-maps": "^3.0",
         "doctrine/dbal": "^4.2",
         "filament/filament": "^3.3",
         "intervention/image-laravel": "^1.5",
