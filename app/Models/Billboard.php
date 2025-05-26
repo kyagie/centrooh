@@ -108,6 +108,14 @@ class Billboard extends Model implements AuditableContract
     }
     
     /**
+     * Get the media owner that owns the billboard.
+     */
+    public function mediaOwner()
+    {
+        return $this->belongsTo(MediaOwner::class);
+    }
+    
+    /**
      * Scope a query to only include active billboards.
      */
     public function scopeActive($query)

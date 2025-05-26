@@ -69,6 +69,11 @@ class BillboardResource extends Resource
                     ->relationship('district', 'name')
                     ->searchable()
                     ->required(),
+                Forms\Components\Select::make('media_owner_id')
+                    ->label('Media Owner')
+                    ->relationship('mediaOwner', 'name')
+                    ->searchable()
+                    ->required(),
             ]);
     }
 
@@ -100,6 +105,9 @@ class BillboardResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('agent.user.name')
                     ->label('Agent Assigned')
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('mediaOwner.name')
+                    ->label('Media Owner')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
