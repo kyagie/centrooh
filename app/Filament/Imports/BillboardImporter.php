@@ -33,10 +33,15 @@ class BillboardImporter extends Importer
 
     public function resolveRecord(): ?Billboard
     {
-        // return Billboard::firstOrNew([
-        //     // Update existing records, matching them by `$this->data['column_name']`
-        //     'email' => $this->data['email'],
-        // ]);
+        return Billboard::firstOrNew([
+            // Update existing records, matching them by `$this->data['column_name']`
+            'name' => $this->data['name'],
+            'address' => $this->data['address'],
+            'location' => $this->data['location'],
+            'latitude' => $this->data['latitude'],
+            'longitude' => $this->data['longitude'],
+            'district_id' => $this->data['district'],
+        ]);
 
         return new Billboard();
     }
