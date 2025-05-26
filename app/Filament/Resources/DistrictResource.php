@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Exports\DistrictExporter;
 use App\Filament\Imports\DistrictImporter;
 use App\Filament\Resources\DistrictResource\Pages;
 use App\Filament\Resources\DistrictResource\RelationManagers;
@@ -14,6 +15,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Tables\Actions\ImportAction;
+use Filament\Tables\Actions\ExportAction;
 
 class DistrictResource extends Resource
 {
@@ -47,10 +49,12 @@ class DistrictResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            // ->headerActions([
-            //     ImportAction::make()
-            //         ->importer(DistrictImporter::class)
-            // ])
+            ->headerActions([
+                ImportAction::make()
+                    ->importer(DistrictImporter::class),
+                ExportAction::make()
+                    ->exporter(DistrictExporter::class),
+            ])
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),

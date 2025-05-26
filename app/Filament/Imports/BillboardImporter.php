@@ -18,32 +18,27 @@ class BillboardImporter extends Importer
                 ->requiredMapping(),
             ImportColumn::make('address')
                 ->requiredMapping(),
-            ImportColumn::make('location')
+            ImportColumn::make('area')
                 ->requiredMapping(),
             ImportColumn::make('latitude')
                 ->requiredMapping(),
             ImportColumn::make('longitude')
                 ->requiredMapping(),
             ImportColumn::make('district')
-                ->relationship('district', 'name')
-                ->requiredMapping()
-                ->rules(['required', 'exists:districts,name']),
+                ->relationship('district', 'name'),
+            ImportColumn::make('mediaOwner')
+                ->relationship('mediaOwner', 'name')
+                ->requiredMapping(),
         ];
     }
 
     public function resolveRecord(): ?Billboard
     {
+        // Assuming 'name' can be used as a unique identifier for billboards
+        // You may need to adjust this if there's another unique identifier
         return Billboard::firstOrNew([
-            // Update existing records, matching them by `$this->data['column_name']`
             'name' => $this->data['name'],
-            'address' => $this->data['address'],
-            'location' => $this->data['location'],
-            'latitude' => $this->data['latitude'],
-            'longitude' => $this->data['longitude'],
-            'district_id' => $this->data['district'],
         ]);
-
-        return new Billboard();
     }
 
     public static function getCompletedNotificationBody(Import $import): string
