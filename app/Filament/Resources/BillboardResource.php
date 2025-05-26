@@ -46,6 +46,10 @@ class BillboardResource extends Resource
                     ->label('Assigned Agent')
                     ->relationship('agent', 'username')
                     ->searchable(),
+                Forms\Components\Select::make('media_owner_id')
+                    ->label('Media Owner')
+                    ->relationship('mediaOwner', 'name')
+                    ->searchable(),
                 Forms\Components\Toggle::make('is_active')
                     ->required(),
                 Forms\Components\Select::make('update_interval')
@@ -73,6 +77,12 @@ class BillboardResource extends Resource
                     ->placeholder('Start typing to search for a location')
                     ->maxLength(1024)
                     ->required(),
+                Forms\Components\TextInput::make('latitude')
+                    ->label('Latitude')
+                    ->lazy(),
+                Forms\Components\TextInput::make('longitude')
+                    ->label('Longitude')
+                    ->lazy(),
                 Map::make('map')
                     ->reactive()
                     ->afterStateUpdated(function ($state, callable $get, callable $set) {
@@ -88,7 +98,7 @@ class BillboardResource extends Resource
                         'searchBoxControl'  => false,
                         'zoomControl'       => true,
                     ])
-                    ->height(fn() => '800px')
+                    ->height(fn() => '400px')
                     ->defaultZoom(12)
                     ->defaultLocation(fn($record) => [
                         $record->latitude ?? 0.3401327,
@@ -104,12 +114,6 @@ class BillboardResource extends Resource
                     ->geolocate()
                     ->geolocateOnLoad(true, false)
                     ->columnSpanFull(),
-                Forms\Components\TextInput::make('latitude')
-                    ->label('Latitude')
-                    ->lazy(),
-                Forms\Components\TextInput::make('longitude')
-                    ->label('Longitude')
-                    ->lazy(),
             ]);
     }
 
