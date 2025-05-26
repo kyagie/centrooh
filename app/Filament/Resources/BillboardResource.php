@@ -76,8 +76,8 @@ class BillboardResource extends Resource
                 Map::make('map')
                     ->reactive()
                     ->afterStateUpdated(function ($state, callable $get, callable $set) {
-                        $set('lat', $state['lat']);
-                        $set('lng', $state['lng']);
+                        $set('latitude', $state['lat']);
+                        $set('longitude', $state['lng']);
                     })
                     ->mapControls([
                         'mapTypeControl'    => false,
@@ -91,8 +91,8 @@ class BillboardResource extends Resource
                     ->height(fn() => '800px')
                     ->defaultZoom(12)
                     ->defaultLocation(fn($record) => [
-                        $record->lat ?? 0.3401327,
-                        $record->lng ?? 32.5864384,
+                        $record->latitude ?? 0.3401327,
+                        $record->longitude ?? 32.5864384,
                     ])
                     ->draggable()
                     ->clickable(false)
@@ -104,25 +104,11 @@ class BillboardResource extends Resource
                     ->geolocate()
                     ->geolocateOnLoad(true, false)
                     ->columnSpanFull(),
-                Forms\Components\TextInput::make('lat')
+                Forms\Components\TextInput::make('latitude')
                     ->label('Latitude')
-                    ->reactive()
-                    ->afterStateUpdated(function ($state, callable $get, callable $set) {
-                        $set('map', [
-                            'lat' => floatVal($state),
-                            'lng' => floatVal($get('longitude')),
-                        ]);
-                    })
                     ->lazy(),
-                Forms\Components\TextInput::make('lng')
+                Forms\Components\TextInput::make('longitude')
                     ->label('Longitude')
-                    ->reactive()
-                    ->afterStateUpdated(function ($state, callable $get, callable $set) {
-                        $set('map', [
-                            'lat' => floatval($get('latitude')),
-                            'lng' => floatVal($state),
-                        ]);
-                    })
                     ->lazy(),
             ]);
     }
