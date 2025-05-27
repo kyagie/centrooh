@@ -18,9 +18,9 @@ class AgentDistrictsRelationManager extends RelationManager
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('district_id')
-                    ->required()
-                    ->maxLength(255),
+                Forms\Components\Select::make('district_id')
+                    ->relationship('district', 'name')
+                    ->required(),
             ]);
     }
 
@@ -29,7 +29,10 @@ class AgentDistrictsRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('district_id')
             ->columns([
-                Tables\Columns\TextColumn::make('district_id'),
+                Tables\Columns\TextColumn::make('district.name')
+                    ->label('District Name')
+                    ->searchable()
+                    ->sortable(),
             ])
             ->filters([
                 //
@@ -38,13 +41,13 @@ class AgentDistrictsRelationManager extends RelationManager
                 Tables\Actions\CreateAction::make(),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                // Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
+                // Tables\Actions\BulkActionGroup::make([
+                    // Tables\Actions\DeleteBulkAction::make(),
+                // ]),
             ]);
     }
 }

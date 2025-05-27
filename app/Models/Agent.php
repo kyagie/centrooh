@@ -40,8 +40,6 @@ class Agent extends Model implements AuditableContract
         'user_id',
         'created_by',
         'approved_by',
-        'region_id',
-        'district_id'
     ];
 
     protected $appends = ['profile_picture_url'];
