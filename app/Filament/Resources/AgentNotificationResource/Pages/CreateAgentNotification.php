@@ -23,12 +23,28 @@ class CreateAgentNotification extends CreateRecord
             $agentIds = Agent::pluck('id')->all();
         }
 
-        $lastNotification = null;
+        // Prepare batch data
+        $notificationsToInsert = [];
         foreach ($agentIds as $agentId) {
-            $notificationData = $data;
-            $notificationData['agent_id'] = $agentId;
-            $lastNotification = AgentNotification::create($notificationData);
+            $notificationsToInsert[] = array_merge($data, [
+            'agent_id' => $agentId,
+            'created_at' => now(),
+            'updated_at' => now(),
+            ]);
         }
-        return $lastNotification;
+
+        // Use chunk insert to improve performance
+        $chunkSize = 100;
+        $lastInsertedId = null;
+        
+        foreach (array_chunk($notificationsToInsert, $chunkSize) as $chunk) {
+            AgentNotification::insert($chunk);
+            if (!$lastInsertedId) {
+            $lastInsertedId = AgentNotification::latest('id')->first()->id;
+            }
+        }
+
+        // Return the last created notification
+        return AgentNotification::find($lastInsertedId);
     }
 }
