@@ -12,6 +12,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Models\Agent;
 
 class AgentNotificationResource extends Resource
 {
@@ -26,18 +27,21 @@ class AgentNotificationResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Select::make('agent_id')
-                    ->relationship('agent.user', 'name')
-                    ->searchable([
-                        'name'
-                    ])
+                Forms\Components\Select::make('agent_ids')
+                    ->label('Agents')
+                    ->multiple()
+                    ->options(function () {
+                        $agents = Agent::with('user')->get();
+                        $options = $agents->pluck('user.name', 'id')->toArray();
+                        return ['all' => 'All Agents'] + $options;
+                    })
+                    ->searchable()
                     ->searchPrompt('Search by name')
                     ->searchingMessage('Searching...')
                     ->noSearchResultsMessage('No results found')
                     ->required(),
                 Forms\Components\Select::make('agent_notification_type_id')
                     ->label('Notification Type')
-                    ->relationship('agentNotificationType', 'name')
                     ->relationship('agentNotificationType', 'name')
                     ->searchable([
                         'name'
