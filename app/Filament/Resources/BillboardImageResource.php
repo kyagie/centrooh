@@ -56,10 +56,10 @@ class BillboardImageResource extends Resource
                         'updated' => 'Updated',
                     ])
                     ->default('pending'),
-                Forms\Components\Select::make('agent_id')
-                    ->label('Agent Assigned')
-                    ->relationship('agent', 'username')
-                    ->searchable(),
+                // Forms\Components\Select::make('agent_id')
+                //     ->label('Agent Assigned')
+                //     ->relationship('agent', 'username')
+                //     ->searchable(),
                 // Forms\Components\TextInput::make('meta'),
             ]);
     }
