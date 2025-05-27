@@ -16,4 +16,11 @@ class ListBillboards extends ListRecords
             Actions\CreateAction::make(),
         ];
     }
+    
+    protected function getHeaderWidgets(): array
+    {
+        return [
+            BillboardResource\Widgets\StatsOverviewWidget::class,
+        ];
+    }
 }
