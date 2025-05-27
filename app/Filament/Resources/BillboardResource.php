@@ -134,10 +134,10 @@ class BillboardResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->headerActions([
-                ImportAction::make()
-                    ->importer(BillboardImporter::class)
-            ])
+            // ->headerActions([
+            //     ImportAction::make()
+            //         ->importer(BillboardImporter::class)
+            // ])
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),
@@ -181,6 +181,7 @@ class BillboardResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                
             ])
             ->bulkActions([]);
     }
