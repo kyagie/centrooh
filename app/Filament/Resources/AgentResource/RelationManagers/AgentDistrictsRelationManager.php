@@ -20,6 +20,7 @@ class AgentDistrictsRelationManager extends RelationManager
             ->schema([
                 Forms\Components\Select::make('district_id')
                     ->relationship('district', 'name')
+                    ->searchable()
                     ->required(),
             ]);
     }
@@ -27,7 +28,7 @@ class AgentDistrictsRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
-            ->recordTitleAttribute('district_id')
+            ->recordTitleAttribute('district.name')
             ->columns([
                 Tables\Columns\TextColumn::make('district.name')
                     ->label('District Name')
@@ -42,7 +43,7 @@ class AgentDistrictsRelationManager extends RelationManager
             ])
             ->actions([
                 // Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                // Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 // Tables\Actions\BulkActionGroup::make([
