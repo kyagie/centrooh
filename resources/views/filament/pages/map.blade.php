@@ -4,9 +4,9 @@
             <h2 class="text-lg font-medium text-gray-900 mb-4">Billboard Locations</h2>
             <div style="height: 600px; width: 100%;">
                 <x-maps-google 
-                :zoomLevel="7.5" 
-                :centerPoint="['lat' => 1.3733, 'long' => 32.2903]" 
-                :fitToBounds="true"
+                    :zoomLevel="7.5" 
+                    :centerPoint="['lat' => 1.3733, 'long' => 32.2903]" 
+                    :markers="$this->billboards"
                 />
             </div>
         </div>
