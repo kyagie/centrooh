@@ -19,14 +19,26 @@ class BillboardsMap extends MapTableWidget
 
 	protected static ?string $pollingInterval = null;
 
-	// protected static ?bool $clustering = true;
+	protected static ?bool $clustering = false;
 
 	protected static ?string $mapId = 'billboards';
 
-	protected static ?string $minHeight = '70vh';
+	protected static ?string $minHeight = '80vh';
 
 	protected int | string | array $columnSpan = 'full';
 
+	protected array $mapConfig = [
+		'draggable' => false,
+		'center'    => [
+			'lat' => 1.3733,
+			'lng' => 32.2903,
+		],
+		'zoom'       => 8,
+		'fit'        => true,
+		'gmaps'      => '',
+		'clustering' => false,
+		'mapConfig'  => [],
+	];
 
 	protected function getTableQuery(): Builder
 	{
@@ -73,10 +85,10 @@ class BillboardsMap extends MapTableWidget
 	{
 		return [
 			RadiusFilter::make('radius')
-				->latitude('lat')  // optional lat and lng fields on your table, default to the getLatLngAttributes() method
-				->longitude('lng') // you should have one your model from the fgm:model-code command when you installed
-				->selectUnit() // add a Kilometer / Miles select
-				->kilometers() // use (or default the select to) kilometers (defaults to miles)
+				->latitude('lat')  
+				->longitude('lng') 
+				->selectUnit()
+				->kilometers()
 				->section('Radius Search'),
 			MapIsFilter::make('map'),
 		];
@@ -107,6 +119,7 @@ class BillboardsMap extends MapTableWidget
 					'lng' => $location->longitude ? round(floatval($location->longitude), static::$precision) : 0,
 				],
 				'name'      => $location->name,
+				'label'     => $location->name,
 			];
 		}
 
