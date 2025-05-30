@@ -44,7 +44,7 @@ return [
      | https://developers.google.com/maps/faq#languagesupport
      */
     'locale' => [
-        'region'   => env('FILAMENT_GOOGLE_MAPS_REGION_CODE', null),
+        'region'   => env('FILAMENT_GOOGLE_MAPS_REGION_CODE', 'UG'),
         'language' => env('FILAMENT_GOOGLE_MAPS_LANGUAGE_CODE', null),
         'api'      => env('FILAMENT_GOOGLE_MAPS_API_LANGUAGE_CODE', null),
     ],
@@ -60,7 +60,7 @@ return [
      | logs.  Typically only useful for debugging, or if youw ant to keep track of a scheduled geocoding task.
      */
     'log' => [
-        'channel' => env('FILAMENT_GOOGLE_MAPS_LOG_CHANNEL', 'null'),
+        'channel' => env('FILAMENT_GOOGLE_MAPS_LOG_CHANNEL', 'single'),
     ],
 
     /*
@@ -72,7 +72,7 @@ return [
 
     'cache' => [
         'duration' => env('FILAMENT_GOOGLE_MAPS_CACHE_DURATION_SECONDS', 60 * 60 * 24 * 30),
-        'store'    => env('FILAMENT_GOOGLE_MAPS_CACHE_STORE', null),
+        'store'    => env('FILAMENT_GOOGLE_MAPS_CACHE_STORE', 'redis'),
     ],
 
     /*
@@ -80,5 +80,5 @@ return [
     | may be needed if your app is behind a reverse proxy.
     */
 
-    'force-https' => env('FILAMENT_GOOGLE_MAPS_FORCE_HTTPS', false),
+    'force-https' => env('FILAMENT_GOOGLE_MAPS_FORCE_HTTPS', true),
 ];
