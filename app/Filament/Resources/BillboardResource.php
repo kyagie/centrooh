@@ -183,6 +183,8 @@ class BillboardResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                //Todo: Request Billboard Image Action
+                //Todo: Assign Agent Action
                 
             ])
             ->bulkActions([]);
