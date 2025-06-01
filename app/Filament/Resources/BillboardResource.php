@@ -42,6 +42,8 @@ class BillboardResource extends Resource
                                     ->required()
                                     ->maxLength(255),
                                 Forms\Components\Select::make('status')
+                                    ->label('Status')
+                                    ->disabled()
                                     ->options([
                                         'pending' => 'Pending',
                                         'updated' => 'Updated',
