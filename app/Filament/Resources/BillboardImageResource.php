@@ -26,6 +26,8 @@ class BillboardImageResource extends Resource
 
     protected static ?string $navigationGroup = 'Billboard Management';
 
+    protected static ?int $navigationSort = 2;
+
     public static function getStatusSelectField(string $name = 'status'): Forms\Components\Select
     {
         return Forms\Components\Select::make($name)
@@ -119,7 +121,7 @@ class BillboardImageResource extends Resource
             ])
             ->actions([
                 Action::make('review')
-                    ->visible(fn (BillboardImage $record): bool => $record->status === 'pending' || $record->status === 'in_review')
+                    ->visible(fn(BillboardImage $record): bool => $record->status === 'pending' || $record->status === 'in_review')
                     ->label('Review')
                     ->icon('heroicon-o-check-circle')
                     ->form([
@@ -136,7 +138,7 @@ class BillboardImageResource extends Resource
                             'user_id' => Auth::id(),
                             'review_note' => $data['review_notes'],
                         ]);
-                        
+
                         app(AgentNotificationService::class)->sendBillboardReviewNotification(
                             $record,
                             $data['status'],
