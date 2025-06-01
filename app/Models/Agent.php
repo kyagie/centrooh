@@ -42,12 +42,22 @@ class Agent extends Model implements AuditableContract
         'approved_by',
     ];
 
-    protected $appends = ['profile_picture_url'];
+    protected $appends = ['profile_picture_url', 'member_since'];
 
 
     public function getProfilePictureUrlAttribute()
     {
         return $this->profile_picture ? Storage::url($this->profile_picture) : null;
+    }
+    
+    /**
+     * Get the member since date in a human-readable format.
+     *
+     * @return string
+     */
+    public function getMemberSinceAttribute()
+    {
+        return $this->created_at ? $this->created_at->format('F j, Y') : null;
     }
 
     /**

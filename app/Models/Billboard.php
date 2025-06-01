@@ -39,6 +39,7 @@ class Billboard extends Model implements AuditableContract
 
     protected $appends = [
         'location',
+        'last_updated',
     ];
 
     /**
@@ -168,5 +169,15 @@ class Billboard extends Model implements AuditableContract
     public static function getComputedLocation(): string
     {
         return 'location';
+    }
+
+    /**
+     * Get the last updated date in a human-readable format.
+     *
+     * @return string|null
+     */
+    public function getLastUpdatedAttribute()
+    {
+        return $this->updated_at ? $this->updated_at->format('F j, Y') : null;
     }
 }
