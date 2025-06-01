@@ -179,7 +179,7 @@ class AgentController extends Controller
             ->with(['district', 'siteCode', 'images' => function ($query) {
                 $query->active();
             }])
-            ->orderBy('created_at', 'desc')
+            ->orderBy('updated_at', 'desc')
             ->paginate(7);
 
         return response()->json([
