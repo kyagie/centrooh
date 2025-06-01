@@ -26,35 +26,52 @@ class AgentResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Select::make('user_id')
-                    ->label('Full Name')
-                    ->relationship('user', 'name')
-                    ->disabled(),
-                Forms\Components\TextInput::make('username')
-                    ->required()
-                    ->maxLength(255)
-                    ->disabled(),
-                Forms\Components\TextInput::make('phone_number')
-                    ->tel()
-                    ->maxLength(255)
-                    ->disabled(),
-                Forms\Components\Select::make('status')
-                    ->options([
-                        'active' => 'Active',
-                        'inactive' => 'Inactive',
-                        'suspended' => 'Suspended',
-                    ])
-                    ->required(),
-                Forms\Components\FileUpload::make('profile_picture')
-                    ->disk('do')
-                    ->directory('profile_pictures')
-                    ->image()
-                    ->imageEditor()
-                    ->imageEditorAspectRatios([
-                        null,
-                        '16:9',
-                        '4:3',
-                        '1:1',
+                Forms\Components\Section::make('Agent Information')
+                    ->description('Basic information about the agent')
+                    ->collapsible()
+                    ->schema([
+                        Forms\Components\Grid::make(2)
+                            ->schema([
+                                Forms\Components\Select::make('user_id')
+                                    ->label('Full Name')
+                                    ->relationship('user', 'name')
+                                    ->disabled(),
+                                Forms\Components\TextInput::make('username')
+                                    ->required()
+                                    ->maxLength(255)
+                                    ->disabled(),
+                            ]),
+                        Forms\Components\Grid::make(2)
+                            ->schema([
+                                Forms\Components\TextInput::make('phone_number')
+                                    ->tel()
+                                    ->maxLength(255)
+                                    ->disabled(),
+                                Forms\Components\Select::make('status')
+                                    ->options([
+                                        'active' => 'Active',
+                                        'inactive' => 'Inactive',
+                                        'suspended' => 'Suspended',
+                                    ])
+                                    ->required(),
+                            ]),
+                    ]),
+                
+                Forms\Components\Section::make('Profile Picture')
+                    ->description('Upload or update the agent\'s profile picture')
+                    ->collapsible()
+                    ->schema([
+                        Forms\Components\FileUpload::make('profile_picture')
+                            ->disk('do')
+                            ->directory('profile_pictures')
+                            ->image()
+                            ->imageEditor()
+                            ->imageEditorAspectRatios([
+                                null,
+                                '16:9',
+                                '4:3',
+                                '1:1',
+                            ]),
                     ]),
             ]);
     }
