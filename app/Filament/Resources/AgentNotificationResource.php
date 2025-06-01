@@ -13,6 +13,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Models\Agent;
+use Illuminate\Database\Eloquent\Model;
 
 class AgentNotificationResource extends Resource
 {
@@ -92,7 +93,8 @@ class AgentNotificationResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                //Todo: View Action
+                // Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -115,5 +117,10 @@ class AgentNotificationResource extends Resource
             'create' => Pages\CreateAgentNotification::route('/create'),
             'edit' => Pages\EditAgentNotification::route('/{record}/edit'),
         ];
+    }
+
+    public static function canEdit(Model $record): bool
+    {
+        return false;
     }
 }

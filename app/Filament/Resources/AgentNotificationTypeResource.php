@@ -75,6 +75,7 @@ class AgentNotificationTypeResource extends Resource
                 //
             ])
             ->actions([
+                //Todo: View Action
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
