@@ -32,104 +32,140 @@ class BillboardResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('name')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\Select::make('status')
-                    ->options([
-                        'pending' => 'Pending',
-                        'updated' => 'Updated',
-                        'rejected' => 'Rejected',
-                        'in_review' => 'In Review',
-                        'passed' => 'Passed',
-                    ])
-                    ->required(),
-                Forms\Components\Select::make('agent_id')
-                    ->label('Assigned Agent')
-                    ->relationship('agent', 'username')
-                    ->searchable()
-                    ->disabled(fn (callable $get) => !$get('district_id'))
-                    ->helperText(
-                        fn (callable $get) => !$get('district_id')
-                            ? 'Select a district first to assign an agent.'
-                            : 'Select an agent to assign to this billboard.'
-                    )
-                    ->required(fn (callable $get) => !empty($get('agent_id')) ? !empty($get('district_id')) : false)
-                    ->rule(function (callable $get) {
-                        return function ($attribute, $value, $fail) use ($get) {
-                            if ($value && !$get('district_id')) {
-                                $fail('A district must be selected before assigning an agent.');
-                            }
-                        };
-                    }),
-                Forms\Components\Select::make('media_owner_id')
-                    ->label('Media Owner')
-                    ->relationship('mediaOwner', 'name')
-                    ->searchable(),
-                Forms\Components\Toggle::make('is_active')
-                    ->required(),
-                Forms\Components\Select::make('update_interval')
-                    ->options([
-                        'daily' => 'Daily',
-                        'weekly' => 'Weekly',
-                        'biweekly' => 'Biweekly',
-                        'monthly' => 'Monthly',
-                        'bimonthly' => 'Bimonthly',
-                        'quarterly' => 'Quarterly',
-                    ])
-                    ->default('monthly'),
-                Forms\Components\Select::make('district_id')
-                    ->label('District')
-                    ->options(District::get()->pluck('name', 'id')->toArray())
-                    ->searchable()
-                    ->required(),
-                Forms\Components\Textarea::make('address')
-                    ->label('Address')
-                    ->autosize()
-                    ->maxLength(1024)
-                    ->required(),
-                Forms\Components\TextInput::make('area')
-                    ->label('Location')
-                    ->placeholder('Start typing to search for a location')
-                    ->maxLength(1024)
-                    ->required(),
-                Forms\Components\TextInput::make('latitude')
-                    ->label('Latitude')
-                    ->lazy(),
-                Forms\Components\TextInput::make('longitude')
-                    ->label('Longitude')
-                    ->lazy(),
-                Map::make('map')
-                    ->reactive()
-                    ->afterStateUpdated(function ($state, callable $get, callable $set) {
-                        $set('latitude', $state['lat']);
-                        $set('longitude', $state['lng']);
-                    })
-                    ->mapControls([
-                        'mapTypeControl'    => false,
-                        'scaleControl'      => true,
-                        'streetViewControl' => false,
-                        'rotateControl'     => false,
-                        'fullscreenControl' => true,
-                        'searchBoxControl'  => false,
-                        'zoomControl'       => true,
-                    ])
-                    ->height(fn() => '400px')
-                    ->defaultZoom(12)
-                    ->defaultLocation(fn($record) => [
-                        $record->latitude ?? 0.3401327,
-                        $record->longitude ?? 32.5864384,
-                    ])
-                    ->draggable()
-                    ->clickable(false)
-                    ->autocomplete('area', placeField: 'name', types: [
-                        'geocode',
-                        'establishment',
-                    ], countries: ['UG'])
-                    ->autocompleteReverse()
-                    ->geolocate()
-                    ->geolocateOnLoad(true, false)
-                    ->columnSpanFull(),
+                Forms\Components\Section::make('Basic Information')
+                    ->description('Enter the basic details of the billboard')
+                    ->collapsible()
+                    ->schema([
+                        Forms\Components\Grid::make(2)
+                            ->schema([
+                                Forms\Components\TextInput::make('name')
+                                    ->required()
+                                    ->maxLength(255),
+                                Forms\Components\Select::make('status')
+                                    ->options([
+                                        'pending' => 'Pending',
+                                        'updated' => 'Updated',
+                                        'rejected' => 'Rejected',
+                                        'in_review' => 'In Review',
+                                        'passed' => 'Passed',
+                                    ])
+                                    ->required(),
+                            ]),
+                        Forms\Components\Grid::make(2)
+                            ->schema([
+                                Forms\Components\Select::make('media_owner_id')
+                                    ->label('Media Owner')
+                                    ->relationship('mediaOwner', 'name')
+                                    ->searchable(),
+                                Forms\Components\Toggle::make('is_active')
+                                    ->label('Is Active')
+                                    ->required(),
+                            ]),
+                        Forms\Components\Select::make('update_interval')
+                            ->options([
+                                'daily' => 'Daily',
+                                'weekly' => 'Weekly',
+                                'biweekly' => 'Biweekly',
+                                'monthly' => 'Monthly',
+                                'bimonthly' => 'Bimonthly',
+                                'quarterly' => 'Quarterly',
+                            ])
+                            ->default('monthly'),
+                    ]),
+                
+                Forms\Components\Section::make('Assignment Information')
+                    ->description('Assign a district and agent to this billboard')
+                    ->collapsible()
+                    ->schema([
+                        Forms\Components\Grid::make(2)
+                            ->schema([
+                                Forms\Components\Select::make('district_id')
+                                    ->label('District')
+                                    ->options(District::get()->pluck('name', 'id')->toArray())
+                                    ->searchable()
+                                    ->required(),
+                                Forms\Components\Select::make('agent_id')
+                                    ->label('Assigned Agent')
+                                    ->relationship('agent', 'username')
+                                    ->searchable()
+                                    ->disabled(fn (callable $get) => !$get('district_id'))
+                                    ->helperText(
+                                        fn (callable $get) => !$get('district_id')
+                                            ? 'Select a district first to assign an agent.'
+                                            : 'Select an agent to assign to this billboard.'
+                                    )
+                                    ->required(fn (callable $get) => !empty($get('agent_id')) ? !empty($get('district_id')) : false)
+                                    ->rule(function (callable $get) {
+                                        return function ($attribute, $value, $fail) use ($get) {
+                                            if ($value && !$get('district_id')) {
+                                                $fail('A district must be selected before assigning an agent.');
+                                            }
+                                        };
+                                    }),
+                            ]),
+                    ]),
+                
+                Forms\Components\Section::make('Location Details')
+                    ->description('Specify the location information for this billboard')
+                    ->collapsible()
+                    ->schema([
+                        Forms\Components\Grid::make(1)
+                            ->schema([
+                                Forms\Components\Textarea::make('address')
+                                    ->label('Address')
+                                    ->autosize()
+                                    ->maxLength(1024)
+                                    ->required(),
+                            ]),
+                        Forms\Components\Grid::make(3)
+                            ->schema([
+                                Forms\Components\TextInput::make('area')
+                                    ->label('Location')
+                                    ->placeholder('Start typing to search for a location')
+                                    ->maxLength(1024)
+                                    ->required()
+                                    ->columnSpan(1),
+                                Forms\Components\TextInput::make('latitude')
+                                    ->label('Latitude')
+                                    ->lazy()
+                                    ->columnSpan(1),
+                                Forms\Components\TextInput::make('longitude')
+                                    ->label('Longitude')
+                                    ->lazy()
+                                    ->columnSpan(1),
+                            ]),
+                        Map::make('map')
+                            ->reactive()
+                            ->afterStateUpdated(function ($state, callable $get, callable $set) {
+                                $set('latitude', $state['lat']);
+                                $set('longitude', $state['lng']);
+                            })
+                            ->mapControls([
+                                'mapTypeControl'    => false,
+                                'scaleControl'      => true,
+                                'streetViewControl' => false,
+                                'rotateControl'     => false,
+                                'fullscreenControl' => true,
+                                'searchBoxControl'  => false,
+                                'zoomControl'       => true,
+                            ])
+                            ->height(fn() => '400px')
+                            ->defaultZoom(12)
+                            ->defaultLocation(fn($record) => [
+                                $record->latitude ?? 0.3401327,
+                                $record->longitude ?? 32.5864384,
+                            ])
+                            ->draggable()
+                            ->clickable(false)
+                            ->autocomplete('area', placeField: 'name', types: [
+                                'geocode',
+                                'establishment',
+                            ], countries: ['UG'])
+                            ->autocompleteReverse()
+                            ->geolocate()
+                            ->geolocateOnLoad(true, false)
+                            ->columnSpanFull(),
+                    ]),
             ]);
     }
 
