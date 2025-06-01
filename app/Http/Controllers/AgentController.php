@@ -268,7 +268,7 @@ class AgentController extends Controller
             $billboard->images()->create([
                 'image_path' => $path,
                 'image_type' => 'billboard',
-                'status' => 'pending',
+                'status' => 'in_review',
                 'uploader_type' => 'agent',
                 'is_primary' => false,
                 'meta' => $request->input('meta'),
