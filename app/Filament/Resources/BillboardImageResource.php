@@ -5,13 +5,18 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\BillboardImageResource\Pages;
 use App\Filament\Resources\BillboardImageResource\RelationManagers;
 use App\Models\BillboardImage;
+use App\Services\AgentNotificationService;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Actions\Action;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Forms\Components\RichEditor;
+use Filament\Forms\Components\TextInput;
+use Illuminate\Support\Facades\Auth;
 
 class BillboardImageResource extends Resource
 {
@@ -20,7 +25,20 @@ class BillboardImageResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-photo';
 
     protected static ?string $navigationGroup = 'Billboard Management';
-    
+
+    public static function getStatusSelectField(string $name = 'status'): Forms\Components\Select
+    {
+        return Forms\Components\Select::make($name)
+            ->options([
+                // 'active' => 'Active',
+                'pending' => 'Pending',
+                // 'reviewed' => 'Reviewed',
+                'rejected' => 'Rejected',
+                'in_review' => 'In Review',
+                'passed' => 'Passed',
+                // 'updated' => 'Updated',
+            ]);
+    }
 
     public static function form(Form $form): Form
     {
@@ -29,8 +47,7 @@ class BillboardImageResource extends Resource
                 Forms\Components\Select::make('billboard_id')
                     ->label('Billboard Name')
                     ->relationship('billboard', 'name')
-                    ->searchable()
-                    ->required(),
+                    ->disabled(),
                 Forms\Components\FileUpload::make('image_path')
                     ->label('Image')
                     ->image()
@@ -45,17 +62,7 @@ class BillboardImageResource extends Resource
                         '1:1',
                     ]),
                 // Forms\Components\TextInput::make('image_type'),
-                Forms\Components\Select::make('status')
-                    ->options([
-                        'active' => 'Active',
-                        'pending' => 'Pending',
-                        'reviewed' => 'Reviewed',
-                        'rejected' => 'Rejected',
-                        'in_review' => 'In Review',
-                        'passed' => 'Passed',
-                        'updated' => 'Updated',
-                    ])
-                    ->default('pending'),
+                // self::getStatusSelectField(),
                 // Forms\Components\Select::make('agent_id')
                 //     ->label('Agent Assigned')
                 //     ->relationship('agent', 'username')
@@ -106,12 +113,37 @@ class BillboardImageResource extends Resource
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-            ])
+            ])->defaultSort('created_at', 'desc')
             ->filters([
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Action::make('review')
+                    ->visible(fn (BillboardImage $record): bool => $record->status === 'pending' || $record->status === 'in_review')
+                    ->label('Review')
+                    ->icon('heroicon-o-check-circle')
+                    ->form([
+                        self::getStatusSelectField(),
+                        TextInput::make('review_notes')
+                            ->label('Review Notes')
+                            ->required()
+                            ->columnSpanFull(),
+                    ])
+                    ->action(function (array $data, BillboardImage $record) {
+                        $record->status = $data['status'];
+                        $record->save();
+                        $record->reviews()->create([
+                            'user_id' => Auth::id(),
+                            'review_note' => $data['review_notes'],
+                        ]);
+                        
+                        app(AgentNotificationService::class)->sendBillboardReviewNotification(
+                            $record,
+                            $data['status'],
+                            $data['review_notes']
+                        );
+                    })
+
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -123,7 +155,7 @@ class BillboardImageResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            RelationManagers\ReviewsRelationManager::class,
         ];
     }
 
