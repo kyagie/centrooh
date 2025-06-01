@@ -36,7 +36,7 @@ class BillboardImageResource extends Resource
                 'pending' => 'Pending',
                 // 'reviewed' => 'Reviewed',
                 'rejected' => 'Rejected',
-                'in_review' => 'In Review',
+                // 'in_review' => 'In Review',
                 'passed' => 'Passed',
                 // 'updated' => 'Updated',
             ]);
@@ -131,6 +131,18 @@ class BillboardImageResource extends Resource
                             ->required()
                             ->columnSpanFull(),
                     ])
+                    ->mountUsing(function (BillboardImage $record, array $data) {
+                        // Update the status to in_review when the modal opens
+                        if ($record->status === 'pending') {
+                            $record->status = 'in_review';
+                            $record->save();
+                        }
+                        
+                        // Default the status in the form to in_review
+                        $data['status'] = 'in_review';
+                        
+                        return $data;
+                    })
                     ->action(function (array $data, BillboardImage $record) {
                         $record->status = $data['status'];
                         $record->save();
