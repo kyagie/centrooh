@@ -94,14 +94,6 @@ class Billboard extends Model implements AuditableContract
     }
 
     /**
-     * Get the review notes for this billboard.
-     */
-    public function reviewNotes()
-    {
-        return $this->hasMany(BillboardReviewNote::class);
-    }
-
-    /**
      * Get all images for this billboard.
      */
     public function images()
