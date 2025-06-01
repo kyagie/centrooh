@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Observers\BillboardImageObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -9,6 +11,7 @@ use Illuminate\Support\Facades\Storage;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 use OwenIt\Auditing\Auditable;
 
+#[ObservedBy(BillboardImageObserver::class)]
 class BillboardImage extends Model implements AuditableContract
 {
     use HasFactory, SoftDeletes, Auditable;

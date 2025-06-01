@@ -82,13 +82,13 @@ class BillboardImageResource extends Resource
                     ->badge()
                     ->sortable()
                     ->color(fn(string $state): string => match ($state) {
-                        'active' => 'success',
+                        // 'active' => 'success',
                         'pending' => 'warning',
-                        'reviewed' => 'primary',
+                        // 'reviewed' => 'primary',
                         'rejected' => 'danger',
-                        'in_review' => 'info',
+                        'in_review' => 'primary',
                         'passed' => 'success',
-                        'updated' => 'secondary',
+                        // 'updated' => 'success',
                         default => 'secondary',
                     }),
                 // Tables\Columns\TextColumn::make('uploader_type'),
