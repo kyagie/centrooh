@@ -122,4 +122,12 @@ class BillboardImage extends Model implements AuditableContract
     {
         return $query->where('is_primary', true);
     }
+
+    /**
+     * Get the reviews for this billboard image.
+     */
+    public function reviews()
+    {
+        return $this->hasMany(BillboardImageReview::class);
+    }
 }
