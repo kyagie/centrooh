@@ -25,6 +25,8 @@ class AgentNotification extends Model implements AuditableContract
         'read_at' => 'datetime',
     ];
 
+    protected $appends = ['sent_at'];
+
     public function agent()
     {
         return $this->belongsTo(Agent::class);
@@ -53,5 +55,10 @@ class AgentNotification extends Model implements AuditableContract
     public function markAsRead()
     {
         $this->update(['read_at' => now()]);
+    }
+    
+    public function getSentAtAttribute()
+    {
+        return $this->created_at->format('M d, Y \a\t h:i A');
     }
 }
