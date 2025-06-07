@@ -30,7 +30,6 @@ class Billboard extends Model implements AuditableContract
         'longitude',
         'update_interval',
         'district_id',
-        'agent_id',
         'created_by',
         'reviewed_by',
         'location'
@@ -59,14 +58,6 @@ class Billboard extends Model implements AuditableContract
     public function district()
     {
         return $this->belongsTo(District::class);
-    }
-
-    /**
-     * Get the agent assigned to the billboard.
-     */
-    public function agent()
-    {
-        return $this->belongsTo(Agent::class);
     }
 
     /**
