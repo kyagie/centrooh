@@ -12,6 +12,8 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Infolists;
+use Filament\Infolists\Infolist;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -105,6 +107,7 @@ class AgentResource extends Resource
                 //
             ])
             ->actions([
+                Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
@@ -128,6 +131,7 @@ class AgentResource extends Resource
         return [
             'index' => Pages\ListAgents::route('/'),
             'create' => Pages\CreateAgent::route('/create'),
+            'view' => Pages\ViewAgent::route('/{record}'),
             'edit' => Pages\EditAgent::route('/{record}/edit'),
         ];
     }
@@ -135,5 +139,41 @@ class AgentResource extends Resource
     public static function canCreate(): bool
     {
         return false;
+    }
+    
+    public static function infolist(Infolist $infolist): Infolist
+    {
+        return $infolist
+            ->schema([
+                Infolists\Components\Section::make('Agent Information')
+                    ->schema([
+                        Infolists\Components\Grid::make(2)
+                            ->schema([
+                                Infolists\Components\ImageEntry::make('profile_picture')
+                                    ->defaultImageUrl(url('https://placehold.co/600x400'))
+                                    ->circular()
+                                    ->columnSpanFull(),
+                                Infolists\Components\TextEntry::make('user.name')
+                                    ->label('Full Name'),
+                                Infolists\Components\TextEntry::make('username'),
+                                Infolists\Components\TextEntry::make('phone_number'),
+                                Infolists\Components\TextEntry::make('user.email')
+                                    ->label('Email'),
+                                Infolists\Components\TextEntry::make('status')
+                                    ->badge()
+                                    ->color(fn(string $state): string => match ($state) {
+                                        'active' => 'success',
+                                        'inactive' => 'warning',
+                                        'suspended' => 'danger',
+                                    }),
+                                Infolists\Components\TextEntry::make('created_at')
+                                    ->dateTime()
+                                    ->label('Registered On'),
+                                Infolists\Components\TextEntry::make('updated_at')
+                                    ->dateTime()
+                                    ->label('Last Updated'),
+                            ]),
+                    ]),
+            ]);
     }
 }
