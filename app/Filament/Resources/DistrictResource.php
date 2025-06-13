@@ -96,7 +96,7 @@ class DistrictResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            RelationManagers\BillboardsRelationManager::class,
         ];
     }
 

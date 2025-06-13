@@ -94,11 +94,11 @@ class Agent extends Model implements AuditableContract
     }
 
     /**
-     * Get the billboards assigned to this agent.
+     * The billboards assigned to this agent (many-to-many).
      */
     public function billboards()
     {
-        return $this->hasMany(Billboard::class);
+        return $this->belongsToMany(Billboard::class, 'agent_billboard');
     }
 
     /**

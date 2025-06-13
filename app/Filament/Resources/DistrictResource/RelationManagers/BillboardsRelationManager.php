@@ -1,34 +1,24 @@
 <?php
 
-namespace App\Filament\Resources;
+namespace App\Filament\Resources\DistrictResource\RelationManagers;
 
-use App\Filament\Imports\BillboardImporter;
-use App\Filament\Resources\BillboardResource\Pages;
-use App\Filament\Resources\BillboardResource\RelationManagers;
-use App\Filament\Resources\BillboardResource\RelationManagers\ImagesRelationManager;
 use App\Models\Billboard;
-use App\Models\District;
-use Cheesegrits\FilamentGoogleMaps\Fields\Map;
 use Filament\Forms;
 use Filament\Forms\Form;
-use Filament\Resources\Resource;
+use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Filament\Tables\Actions\ImportAction;
+use Cheesegrits\FilamentGoogleMaps\Fields\Map;
 
-class BillboardResource extends Resource
+class BillboardsRelationManager extends RelationManager
 {
-    protected static ?string $model = Billboard::class;
+    protected static string $relationship = 'billboards';
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $recordTitleAttribute = 'name';
 
-    protected static ?string $navigationGroup = 'Billboard Management';
-
-    protected static ?int $navigationSort = 1;
-
-    public static function form(Form $form): Form
+    public function form(Form $form): Form
     {
         return $form
             ->schema([
@@ -43,7 +33,6 @@ class BillboardResource extends Resource
                                     ->maxLength(255),
                                 Forms\Components\Select::make('status')
                                     ->label('Status')
-                                    ->disabled()
                                     ->options([
                                         'pending' => 'Pending',
                                         'updated' => 'Updated',
@@ -73,20 +62,6 @@ class BillboardResource extends Resource
                                 'quarterly' => 'Quarterly',
                             ])
                             ->default('monthly'),
-                    ]),
-                
-                Forms\Components\Section::make('Assignment Information')
-                    ->description('Assign a district and agent to this billboard')
-                    ->collapsible()
-                    ->schema([
-                        Forms\Components\Grid::make(2)
-                            ->schema([
-                                Forms\Components\Select::make('district_id')
-                                    ->label('District')
-                                    ->options(District::get()->pluck('name', 'id')->toArray())
-                                    ->searchable()
-                                    ->required(),
-                            ]),
                     ]),
                 
                 Forms\Components\Section::make('Location Details')
@@ -153,16 +128,13 @@ class BillboardResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table
+    public function table(Table $table): Table
     {
         return $table
-            // ->headerActions([
-            //     ImportAction::make()
-            //         ->importer(BillboardImporter::class)
-            // ])
             ->columns([
                 Tables\Columns\TextColumn::make('name')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
                     ->color(fn(string $state): string => match ($state) {
@@ -176,15 +148,14 @@ class BillboardResource extends Resource
                 Tables\Columns\IconColumn::make('is_active')
                     ->label('Active')
                     ->boolean(),
-                Tables\Columns\TextColumn::make('district.name')
-                    ->label('District')
-                    ->sortable(),
+                Tables\Columns\TextColumn::make('area')
+                    ->label('Location')
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('agents.user.name')
                     ->label('Assigned Agents')
                     ->listWithLineBreaks()
                     ->limitList(2)
-                    ->expandableLimitedList()
-                    ->searchable(),
+                    ->expandableLimitedList(),
                 Tables\Columns\TextColumn::make('mediaOwner.name')
                     ->label('Media Owner')
                     ->sortable(),
@@ -192,41 +163,34 @@ class BillboardResource extends Resource
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('deleted_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                Tables\Filters\SelectFilter::make('status')
+                    ->options([
+                        'pending' => 'Pending',
+                        'updated' => 'Updated',
+                        'rejected' => 'Rejected',
+                        'in_review' => 'In Review',
+                        'passed' => 'Passed',
+                    ]),
+                Tables\Filters\TernaryFilter::make('is_active')
+                    ->label('Active Status')
+                    ->placeholder('All Billboards')
+                    ->trueLabel('Active Billboards')
+                    ->falseLabel('Inactive Billboards'),
+            ])
+            ->headerActions([
+                Tables\Actions\CreateAction::make(),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                //Todo: Request Billboard Image Action
-                //Todo: Assign Agent Action
-                
+                Tables\Actions\ViewAction::make(),
+                // Tables\Actions\EditAction::make(),
+                // Tables\Actions\DeleteAction::make(),
             ])
-            ->bulkActions([]);
-    }
-
-    public static function getRelations(): array
-    {
-        return [
-            //
-            ImagesRelationManager::class,
-        ];
-    }
-
-    public static function getPages(): array
-    {
-        return [
-            'index' => Pages\ListBillboards::route('/'),
-            'create' => Pages\CreateBillboard::route('/create'),
-            'edit' => Pages\EditBillboard::route('/{record}/edit'),
-        ];
+            ->bulkActions([
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\DeleteBulkAction::make(),
+                ]),
+            ]);
     }
 }
