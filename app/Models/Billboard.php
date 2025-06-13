@@ -109,6 +109,14 @@ class Billboard extends Model implements AuditableContract
     }
     
     /**
+     * The agents that are assigned to this billboard (many-to-many).
+     */
+    public function agents()
+    {
+        return $this->belongsToMany(Agent::class, 'agent_billboard');
+    }
+
+    /**
      * Scope a query to only include active billboards.
      */
     public function scopeActive($query)
