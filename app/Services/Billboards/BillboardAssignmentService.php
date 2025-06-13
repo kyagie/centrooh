@@ -84,4 +84,80 @@ class BillboardAssignmentService
             ];
         }
     }
+
+    /**
+     * Detach all billboards in a district from an agent.
+     *
+     * @param AgentDistrict $agentDistrict The agent-district relationship object
+     * @return array Array containing count of detached billboards and any errors
+     */
+    public function detachBillboardsInDistrict(AgentDistrict $agentDistrict): array
+    {
+        $agent = $agentDistrict->agent;
+        $district = $agentDistrict->district;
+
+        if (!$agent || !$district) {
+            return [
+                'success' => false,
+                'message' => 'Agent or district not found',
+                'detached_count' => 0
+            ];
+        }
+
+        try {
+            // Start a database transaction
+            DB::beginTransaction();
+
+            // Get all billboards in the district
+            $billboards = Billboard::where('district_id', $district->id)->get();
+
+            if ($billboards->isEmpty()) {
+                DB::commit();
+                return [
+                    'success' => true,
+                    'message' => 'No billboards found in the district',
+                    'detached_count' => 0
+                ];
+            }
+
+            // Get the billboards that are currently assigned to the agent in this district
+            $assignedBillboards = $agent->billboards()
+                ->wherePivotIn('billboard_id', $billboards->pluck('id'))
+                ->pluck('billboard_id')
+                ->toArray();
+
+            if (empty($assignedBillboards)) {
+                DB::commit();
+                return [
+                    'success' => true,
+                    'message' => 'No billboards were assigned to the agent in this district',
+                    'detached_count' => 0
+                ];
+            }
+
+            // Detach the billboards from the agent
+            $agent->billboards()->detach($assignedBillboards);
+
+            DB::commit();
+
+            return [
+                'success' => true,
+                'message' => count($assignedBillboards) . ' billboards detached from agent successfully',
+                'detached_count' => count($assignedBillboards)
+            ];
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error detaching billboards from agent: ' . $e->getMessage(), [
+                'agent_id' => $agent->id,
+                'district_id' => $district->id,
+                'exception' => $e
+            ]);
+
+            return [
+                'success' => false,
+                'message' => 'Error detaching billboards: ' . $e->getMessage(),
+                'detached_count' => 0
+            ];
+        }
+    }
 }
