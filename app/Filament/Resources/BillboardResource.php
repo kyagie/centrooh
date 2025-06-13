@@ -179,9 +179,12 @@ class BillboardResource extends Resource
                 Tables\Columns\TextColumn::make('district.name')
                     ->label('District')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('agent.user.name')
-                    ->label('Agent Assigned')
-                    ->sortable(),
+                Tables\Columns\TextColumn::make('agents.user.name')
+                    ->label('Assigned Agents')
+                    ->listWithLineBreaks()
+                    ->limitList(2)
+                    ->expandableLimitedList()
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('mediaOwner.name')
                     ->label('Media Owner')
                     ->sortable(),
