@@ -42,6 +42,12 @@ class AdminPanelProvider extends PanelProvider
                 url: asset('assets/fonts/Exo2-Bold.otf'),
                 provider: LocalFontProvider::class,
             )
+            ->navigationGroups([
+                'Billboard Management',
+                'Administration',
+                'Access Control',
+                'Notifications',
+            ])
             ->brandLogo(asset('assets/images/logo.png'))
             ->brandLogoHeight('2.5rem')
             ->unsavedChangesAlerts()
