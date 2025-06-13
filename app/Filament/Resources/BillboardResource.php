@@ -86,24 +86,6 @@ class BillboardResource extends Resource
                                     ->options(District::get()->pluck('name', 'id')->toArray())
                                     ->searchable()
                                     ->required(),
-                                Forms\Components\Select::make('agent_id')
-                                    ->label('Assigned Agent')
-                                    ->relationship('agent', 'username')
-                                    ->searchable()
-                                    ->disabled(fn (callable $get) => !$get('district_id'))
-                                    ->helperText(
-                                        fn (callable $get) => !$get('district_id')
-                                            ? 'Select a district first to assign an agent.'
-                                            : 'Select an agent to assign to this billboard.'
-                                    )
-                                    ->required(fn (callable $get) => !empty($get('agent_id')) ? !empty($get('district_id')) : false)
-                                    ->rule(function (callable $get) {
-                                        return function ($attribute, $value, $fail) use ($get) {
-                                            if ($value && !$get('district_id')) {
-                                                $fail('A district must be selected before assigning an agent.');
-                                            }
-                                        };
-                                    }),
                             ]),
                     ]),
                 
