@@ -78,7 +78,9 @@ class BillboardImageResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('billboard.name'),
-                Tables\Columns\ImageColumn::make('image_path')->simpleLightbox(),
+                Tables\Columns\ImageColumn::make('image_path')
+                ->label('Image')
+                ->simpleLightbox(),
                 // Tables\Columns\ImageColumn::make('image_type'),
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
