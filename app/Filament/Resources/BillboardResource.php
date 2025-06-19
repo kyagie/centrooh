@@ -205,7 +205,7 @@ class BillboardResource extends Resource
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-            ])
+            ])->defaultSort('updated_at', 'desc')
             ->filters([
                 //
             ])
