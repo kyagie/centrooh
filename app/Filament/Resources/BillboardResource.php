@@ -8,15 +8,20 @@ use App\Filament\Resources\BillboardResource\RelationManagers;
 use App\Filament\Resources\BillboardResource\RelationManagers\ImagesRelationManager;
 use App\Models\Billboard;
 use App\Models\District;
+use App\Services\AgentNotificationService;
 use Cheesegrits\FilamentGoogleMaps\Fields\Map;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Tables\Actions\ImportAction;
+use Filament\Infolists;
+use Filament\Infolists\Infolist;
+use Illuminate\Support\Facades\Auth;
 
 class BillboardResource extends Resource
 {
@@ -205,10 +210,8 @@ class BillboardResource extends Resource
                 //
             ])
             ->actions([
+                Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
-                //Todo: Request Billboard Image Action
-                //Todo: Assign Agent Action
-                
             ])
             ->bulkActions([]);
     }
@@ -226,7 +229,89 @@ class BillboardResource extends Resource
         return [
             'index' => Pages\ListBillboards::route('/'),
             'create' => Pages\CreateBillboard::route('/create'),
+            'view' => Pages\ViewBillboard::route('/{record}'),
             'edit' => Pages\EditBillboard::route('/{record}/edit'),
         ];
+    }
+    
+    public static function infolist(Infolist $infolist): Infolist
+    {
+        return $infolist
+            ->schema([
+                Infolists\Components\Section::make('Basic Information')
+                    ->schema([
+                        Infolists\Components\Grid::make(2)
+                            ->schema([
+                                Infolists\Components\TextEntry::make('name')
+                                    ->label('Billboard Name'),
+                                Infolists\Components\TextEntry::make('status')
+                                    ->badge()
+                                    ->color(fn(string $state): string => match ($state) {
+                                        'pending' => 'warning',
+                                        'updated' => 'success',
+                                        'rejected' => 'danger',
+                                        'in_review' => 'primary',
+                                        'passed' => 'success',
+                                    }),
+                                Infolists\Components\TextEntry::make('mediaOwner.name')
+                                    ->label('Media Owner'),
+                                Infolists\Components\IconEntry::make('is_active')
+                                    ->label('Active Status')
+                                    ->boolean(),
+                                Infolists\Components\TextEntry::make('update_interval')
+                                    ->label('Update Interval'),
+                            ]),
+                    ]),
+                
+                Infolists\Components\Section::make('Location Information')
+                    ->schema([
+                        Infolists\Components\Grid::make(2)
+                            ->schema([
+                                Infolists\Components\TextEntry::make('district.name')
+                                    ->label('District'),
+                                Infolists\Components\TextEntry::make('area')
+                                    ->label('Area'),
+                                Infolists\Components\TextEntry::make('address')
+                                    ->label('Address')
+                                    ->columnSpanFull(),
+                                Infolists\Components\TextEntry::make('latitude')
+                                    ->label('Latitude'),
+                                Infolists\Components\TextEntry::make('longitude')
+                                    ->label('Longitude'),
+                            ]),
+                    ]),
+                
+                Infolists\Components\Section::make('Assignment Information')
+                    ->schema([
+                        Infolists\Components\RepeatableEntry::make('agents')
+                            ->schema([
+                                Infolists\Components\Grid::make(2)
+                                    ->schema([
+                                        Infolists\Components\TextEntry::make('user.name')
+                                            ->label('Agent Name'),
+                                        Infolists\Components\TextEntry::make('phone_number')
+                                            ->label('Phone Number'),
+                                    ]),
+                            ])
+                            ->columnSpanFull(),
+                    ]),
+                
+                Infolists\Components\Section::make('Timestamps')
+                    ->schema([
+                        Infolists\Components\Grid::make(3)
+                            ->schema([
+                                Infolists\Components\TextEntry::make('created_at')
+                                    ->dateTime()
+                                    ->label('Created At'),
+                                Infolists\Components\TextEntry::make('updated_at')
+                                    ->dateTime()
+                                    ->label('Last Updated'),
+                                Infolists\Components\TextEntry::make('deleted_at')
+                                    ->dateTime()
+                                    ->label('Deleted At')
+                                    ->visible(fn ($record) => $record->deleted_at !== null),
+                            ]),
+                    ]),
+            ]);
     }
 }
