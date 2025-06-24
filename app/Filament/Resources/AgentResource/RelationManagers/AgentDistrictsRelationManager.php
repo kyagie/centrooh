@@ -10,8 +10,8 @@ use Filament\Tables;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Table;
 use Filament\Notifications\Notification;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Tables\Actions\ActionGroup;
+
 use Illuminate\Support\Facades\DB;
 
 class AgentDistrictsRelationManager extends RelationManager
@@ -115,72 +115,109 @@ class AgentDistrictsRelationManager extends RelationManager
 
             ])
             ->actions([
-                // Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make()
-                    ->requiresConfirmation()
-                    ->modalHeading('Delete District Assignment')
-                    ->modalDescription('Are you sure you want to remove this district assignment? This will also remove all billboard assignments in this district for this agent.')
-                    ->modalSubmitActionLabel('Yes, delete assignment')
-                    ->successNotificationTitle('District assignment removed')
-                    ->before(function ($record) {
-                        // Detach all billboards in this district before deleting the agent-district relationship
-                        $billboardService = app(BillboardAssignmentService::class);
-                        $billboardService->detachBillboardsInDistrict($record);
-                    }),
-                Action::make('detachBillboards')
-                    ->label('Detach Billboards')
-                    ->icon('heroicon-o-trash')
-                    ->color('danger')
-                    ->requiresConfirmation()
-                    ->modalHeading('Detach Billboards')
-                    ->modalDescription('Are you sure you want to detach all billboards in this district from this agent? This action cannot be undone.')
-                    ->modalSubmitActionLabel('Yes, detach billboards')
-                    ->action(function ($record): void {
-                        DB::beginTransaction();
+                ActionGroup::make([
+                    Action::make('detachDistrict')
+                        ->label('Detach District')
+                        ->icon('heroicon-o-trash')
+                        ->color('danger')
+                        ->requiresConfirmation()
+                        ->modalHeading('Detach District')
+                        ->modalDescription('Are you sure you want to detach this district from this agent? This action cannot be undone.')
+                        ->modalSubmitActionLabel('Yes, detach district')
+                        ->action(function ($record): void {
+                            DB::beginTransaction();
 
-                        try {
-                            // Get the agent district relationship
-                            $agentDistrict = $record;
+                            try {
+                                // Get the agent district relationship
+                                $agentDistrict = $record;
 
-                            // Use the service to detach billboards
-                            $billboardService = app(BillboardAssignmentService::class);
-                            $result = $billboardService->detachBillboardsInDistrict($agentDistrict);
+                                // Use the service to detach billboards
+                                $billboardService = app(BillboardAssignmentService::class);
+                                $result = $billboardService->detachBillboardsInDistrict($agentDistrict);
 
-                            DB::commit();
+                                // Delete the agent-district relationship
+                                $agentDistrict->delete();
 
-                            // Show notification based on result
-                            if ($result['success']) {
-                                if ($result['detached_count'] > 0) {
+                                DB::commit();
+
+                                // Show notification based on result
+                                if ($result['success']) {
                                     Notification::make()
                                         ->title('Success')
-                                        ->body("{$result['detached_count']} billboards were detached from the agent.")
+                                        ->body("District detached successfully. {$result['detached_count']} billboards were detached from the agent.")
                                         ->success()
                                         ->send();
                                 } else {
                                     Notification::make()
-                                        ->title('Information')
-                                        ->body("No billboards were detached. {$result['message']}")
-                                        ->info()
+                                        ->title('Warning')
+                                        ->body("Could not detach billboards: {$result['message']}")
+                                        ->warning()
                                         ->send();
                                 }
-                            } else {
+                            } catch (\Exception $e) {
+                                DB::rollBack();
+
                                 Notification::make()
-                                    ->title('Warning')
-                                    ->body("Could not detach billboards: {$result['message']}")
-                                    ->warning()
+                                    ->title('Error')
+                                    ->body("Failed to detach district: {$e->getMessage()}")
+                                    ->danger()
                                     ->send();
                             }
-                        } catch (\Exception $e) {
-                            DB::rollBack();
+                        }),
+                    Action::make('detachBillboards')
+                        ->label('Detach Billboards')
+                        ->icon('heroicon-o-user-minus')
+                        ->color('danger')
+                        ->requiresConfirmation()
+                        ->modalHeading('Detach Billboards')
+                        ->modalDescription('Are you sure you want to detach all billboards in this district from this agent? This action cannot be undone.')
+                        ->modalSubmitActionLabel('Yes, detach billboards')
+                        ->action(function ($record): void {
+                            DB::beginTransaction();
 
-                            Notification::make()
-                                ->title('Error')
-                                ->body("Failed to detach billboards: {$e->getMessage()}")
-                                ->danger()
-                                ->send();
-                        }
-                    }),
-                Action::make('reassignBillboards')
+                            try {
+                                // Get the agent district relationship
+                                $agentDistrict = $record;
+
+                                // Use the service to detach billboards
+                                $billboardService = app(BillboardAssignmentService::class);
+                                $result = $billboardService->detachBillboardsInDistrict($agentDistrict);
+
+                                DB::commit();
+
+                                // Show notification based on result
+                                if ($result['success']) {
+                                    if ($result['detached_count'] > 0) {
+                                        Notification::make()
+                                            ->title('Success')
+                                            ->body("{$result['detached_count']} billboards were detached from the agent.")
+                                            ->success()
+                                            ->send();
+                                    } else {
+                                        Notification::make()
+                                            ->title('Information')
+                                            ->body("No billboards were detached. {$result['message']}")
+                                            ->info()
+                                            ->send();
+                                    }
+                                } else {
+                                    Notification::make()
+                                        ->title('Warning')
+                                        ->body("Could not detach billboards: {$result['message']}")
+                                        ->warning()
+                                        ->send();
+                                }
+                            } catch (\Exception $e) {
+                                DB::rollBack();
+
+                                Notification::make()
+                                    ->title('Error')
+                                    ->body("Failed to detach billboards: {$e->getMessage()}")
+                                    ->danger()
+                                    ->send();
+                            }
+                        }),
+                    Action::make('reassignBillboards')
                     ->label('Reassign Billboards')
                     ->icon('heroicon-o-arrow-path')
                     ->color('warning')
@@ -227,7 +264,8 @@ class AgentDistrictsRelationManager extends RelationManager
                                 ->danger()
                                 ->send();
                         }
-                    })
+                    }),
+                ]),
             ])
             ->bulkActions([
                 // Tables\Actions\BulkActionGroup::make([
