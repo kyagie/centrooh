@@ -14,6 +14,8 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Models\Agent;
 use Illuminate\Database\Eloquent\Model;
+use Filament\Infolists;
+use Filament\Infolists\Infolist;
 
 class AgentNotificationResource extends Resource
 {
@@ -93,7 +95,7 @@ class AgentNotificationResource extends Resource
                 //
             ])
             ->actions([
-                //Todo: View Action
+                Tables\Actions\ViewAction::make(),
                 // Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
@@ -115,6 +117,7 @@ class AgentNotificationResource extends Resource
         return [
             'index' => Pages\ListAgentNotifications::route('/'),
             'create' => Pages\CreateAgentNotification::route('/create'),
+            'view' => Pages\ViewAgentNotification::route('/{record}'),
             'edit' => Pages\EditAgentNotification::route('/{record}/edit'),
         ];
     }
@@ -122,5 +125,33 @@ class AgentNotificationResource extends Resource
     public static function canEdit(Model $record): bool
     {
         return false;
+    }
+
+    public static function infolist(Infolist $infolist): Infolist
+    {
+        return $infolist
+            ->schema([
+                Infolists\Components\Section::make()
+                    ->schema([
+                        Infolists\Components\TextEntry::make('agentNotificationType.name')
+                            ->label('Notification Type'),
+                        Infolists\Components\TextEntry::make('title')
+                            ->label('Title'),
+                        Infolists\Components\TextEntry::make('created_at')
+                            ->label('Sent At')
+                            ->dateTime(),
+                        Infolists\Components\TextEntry::make('read_at')
+                            ->label('Read At')
+                            ->dateTime()
+                            ->placeholder('Not read yet'),
+                    ])->columns(2),
+                    
+                Infolists\Components\Section::make('Notification Content')
+                    ->schema([
+                        Infolists\Components\TextEntry::make('body')
+                            ->label('Content')
+                            ->html(),
+                    ]),
+            ]);
     }
 }
