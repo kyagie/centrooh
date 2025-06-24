@@ -31,6 +31,7 @@ class ImagesRelationManager extends RelationManager
             ->columns([
                 Tables\Columns\ImageColumn::make('image_path')->simpleLightbox(),
                 Tables\Columns\TextColumn::make('status')
+                    ->label('Image Status')
                     ->badge()
                     ->sortable()
                     ->color(fn(string $state): string => match ($state) {
@@ -44,7 +45,7 @@ class ImagesRelationManager extends RelationManager
                         default => 'secondary',
                     }),
 
-            ])
+            ])->defaultSort('created_at', 'desc')
             ->filters([
                 //
             ])
