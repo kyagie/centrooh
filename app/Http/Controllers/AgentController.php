@@ -243,7 +243,7 @@ class AgentController extends Controller
         $billboard = Billboard::find($request->billboard_id);
         $agentId = $request->user()->agent->id;
 
-        if ($billboard->agent_id !== $agentId) {
+        if (!$billboard->agents()->where('agent_id', $agentId)->exists()) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'This billboard is not assigned to you'
