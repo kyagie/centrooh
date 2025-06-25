@@ -8,6 +8,8 @@ use App\Filament\Resources\MediaOwnerResource\RelationManagers;
 use App\Models\MediaOwner;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Infolists;
+use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -71,6 +73,7 @@ class MediaOwnerResource extends Resource
                 //
             ])
             ->actions([
+                Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
@@ -83,7 +86,7 @@ class MediaOwnerResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            RelationManagers\BillboardsRelationManager::class,
         ];
     }
 
@@ -92,7 +95,33 @@ class MediaOwnerResource extends Resource
         return [
             'index' => Pages\ListMediaOwners::route('/'),
             'create' => Pages\CreateMediaOwner::route('/create'),
+            'view' => Pages\ViewMediaOwner::route('/{record}'),
             'edit' => Pages\EditMediaOwner::route('/{record}/edit'),
         ];
+    }
+
+    public static function infolist(Infolist $infolist): Infolist
+    {
+        return $infolist
+            ->schema([
+                Infolists\Components\Section::make('Media Owner Information')
+                    ->schema([
+                        Infolists\Components\TextEntry::make('name')
+                            ->label('Company Name'),
+                        Infolists\Components\TextEntry::make('status')
+                            ->badge()
+                            ->color(fn(string $state): string => match ($state) {
+                                'active' => 'success',
+                                'inactive' => 'danger',
+                                default => 'gray',
+                            }),
+                        Infolists\Components\TextEntry::make('billboards_count')
+                            ->label('Total Billboards')
+                            ->state(function (MediaOwner $record): int {
+                                return $record->billboards()->count();
+                            }),
+                    ])
+                    ->columns(3),
+            ]);
     }
 }
